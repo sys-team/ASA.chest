@@ -11,11 +11,14 @@ begin
     
     declare local temporary table #entity(name varchar(512),
                                           xid GUID,
-                                          xmlData xml);
+                                          xmlData xml,
+                                          primary key(xid));
                                           
-    declare local temporary table #rel(xid GUID,
+    declare local temporary table #rel(name varchar(512),
+                                       childXid GUID,
                                        parentXid GUID,
-                                       name varchar(512));
+                                       xmlData xml,
+                                       primary key(childXid, parentXid));
     
     set @xid = newid();
     
