@@ -1,5 +1,6 @@
 create or replace function ch.chest(
-    @url long varchar
+    @url long varchar,
+    @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('code'))
 )
 returns xml
 begin
@@ -20,12 +21,39 @@ begin
                                        xmlData xml,
                                        primary key(childXid, parentXid));
     
+    if varexists('@UOAuthAccount') = 0 then                                   
+        create variable @UOAuthAccount integer;
+    end if;
+    
+    if varexists('@UOAuthRoles') = 0 then
+        create variable @UOAuthRoles xml;
+    end if;
+    ------------
+    
     set @xid = newid();
     
     insert into ch.log with auto name
     select @xid as xid;
     
     set @request = http_body();
+    
+    set @UOAuthRoles = util.UOAuthAuthorize(@code); 
+    -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
+    
+    set @UOAuthAccount = (select id
+                            from openxml(@UOAuthRoles,'/*:response/*:account')
+                            with (id integer '*:id'));
+                            
+
+    if @UOAuthAccount is null then
+        set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
+        update ch.log
+           set response = @response
+         where xid = @xid;
+            
+        return @response;
+    end if;
+
     
     call ch.readData(@request);
     call ch.saveData();

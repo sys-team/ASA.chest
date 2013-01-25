@@ -11,7 +11,8 @@ begin
            xid
       from #entity
      where xid is not null
-       and name is not null;
+       and name is not null
+       and ch.entityWriteable(name, @UOAuthRoles) = 1;
        
     -- rel
     insert into ch.relationship on existing update with auto name
@@ -29,8 +30,17 @@ begin
            childXid,
            xmlData
       from #rel
-     where parent is not null
-       and child is not null;
+     where parentXid is not null
+       and childXid is not null
+       and ch.entityWriteable(name, @UOAuthRoles) = 1;
+
+    -- delete rel
+    delete from ch.relationship
+    where parentXid in (select xid from #entity)
+      and not exists (select *
+                        from #rel
+                       where parentXid = ch.relationship.parentXid
+                         and childXid = ch.relationship.childXid);
 
 end
 ;
