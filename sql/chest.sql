@@ -11,16 +11,30 @@ begin
     declare @xid GUID;
     declare @service long varchar;
     
-    declare local temporary table #entity(name varchar(512),
-                                          xid GUID,
-                                          xmlData xml,
-                                          primary key(xid));
+    declare local temporary table #entity(
+        name varchar(512),
+        xid GUID,
+        xmlData xml,
+        primary key(xid)
+    );
                                           
-    declare local temporary table #rel(name varchar(512),
-                                       childXid GUID,
-                                       parentXid GUID,
-                                       xmlData xml,
-                                       primary key(childXid, parentXid));
+    declare local temporary table #rel(
+        name varchar(512),
+        childXid GUID,
+        parentXid GUID,
+        xmlData xml,
+        primary key(childXid, parentXid)
+    );
+                                       
+    declare local temporary table #attribute(
+        name varchar(512),
+        dataType varchar(512),
+        value long varchar,
+        xmlData xml,
+        parentXid GUID,
+        parentName varchar(512),
+        primary key(parentXid, name)
+    );
     
     if varexists('@UOAuthAccount') = 0 then                                   
         create variable @UOAuthAccount integer;

@@ -24,6 +24,25 @@ begin
                        where xid = util.strtoxid(t.xid));
                        
     --message 'ch.readData #2';
+    
+    -- attributes
+    insert into #attribute with auto name
+    select name,
+           dataType,
+           value,
+           xmlData,
+           parentXid,
+           parentName
+      from openxml(@request, '/*/*:d/*')
+           with(
+                    name long varchar '@name', 
+                    dataType long varchar '@mp:localname', 
+                    value long varchar '.',
+                    xmlData xml '@mp:xmltext',
+                    parentXid long varchar '../@xid',
+                    parentName long varchar '../@name'
+                )
+     where dataType <> 'd';
            
     -- rels
     insert into #rel with auto name

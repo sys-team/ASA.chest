@@ -63,6 +63,7 @@ comment on table ch.relationship is 'Entity relationship'
 create table ch.attribute(
 
     name varchar(512),
+    dataType varchar(512),
     value long varchar,
     
     xmlData xml,
