@@ -4,7 +4,10 @@ create or replace function ch.entityWriteable(
 )
 returns integer
 begin
+
     declare @result integer;
+    
+    return 1;
     
     if exists(select p.role
                 from openxml(@UOAuthRoles,'/*:response/*:roles/*:role')

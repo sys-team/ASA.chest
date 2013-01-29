@@ -1,6 +1,22 @@
 grant connect to ch;
 grant dba to ch;
 
+create table ch.accessToken(
+
+    token varchar(1024) not null unique,
+    authSystem varchar(128) not null,
+    tokenTs datetime not null,
+    tokenExpiresIn integer not null,
+    xmlData xml,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+
+)
+;
+comment on table ch.accessToken is 'Authorized token'
+;
+
 create table ch.entity(
 
     name varchar(512),
@@ -8,6 +24,8 @@ create table ch.entity(
 
     version integer default 1,
     lastUser integer,
+    
+    not null foreign key(accessToken) references ch.accessToken,
 
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
@@ -42,6 +60,23 @@ create table ch.relationship(
 comment on table ch.relationship is 'Entity relationship'
 ;
 
+create table ch.attribute(
+
+    name varchar(512),
+    value long varchar,
+    
+    xmlData xml,
+
+    not null foreign key(parent) references ch.entity on delete cascade,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.attribute is 'Entity attribute'
+;
+
+
 create table ch.permission(
 
     role STRING,
@@ -59,7 +94,7 @@ comment on table ch.permission is 'Mapping UOAuth roles to entities'
 
 create table ch.entityLog(
 
-    entityXid,
+    entityXid GUID,
     action integer not null,
     auser integer,
     xmlData xml,
@@ -75,7 +110,7 @@ create index xk_entityLog_entityXid on ch.entityLog(entityXid)
 
 create table ch.relationshipLog(
 
-    relationshipXid,
+    relationshipXid GUID,
     action integer not null,
     auser integer,
     xmlData xml,
@@ -86,7 +121,7 @@ create table ch.relationshipLog(
 ;
 comment on table ch.relationshipLog is 'Relationship log'
 ;
-create index xk_entityLog_entityXid on ch.entityLog(entityXid)
+create index xk_relationshipLog_relationshipXid on ch.relationshipLog(relationshipXid)
 ;
 
 

@@ -8,7 +8,8 @@ begin
              where xid = #entity.xid) as id,
            name,
            xmlData,
-           xid
+           xid,
+           @accessTokenId as accessToken
       from #entity
      where xid is not null
        and name is not null
