@@ -58,6 +58,10 @@ begin
     
     set @request = http_body();
     
+    if isnull(@request,'') = '' then
+        return ch.responseRootElement('');
+    end if;
+    
     set @UOAuthRoles = util.UOAuthAuthorize(@code); 
     -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
     
