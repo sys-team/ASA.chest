@@ -18,9 +18,9 @@ begin
                @authSystem as authSystem,
                ts as tokenTs,
                expiresIn as tokenExpiresIn,
-               xmlData
+               @UOAuthRoles as xmlData
           from openxml(@UOAuthRoles, '/*:response/*:token')
-               with(ts datetime '*:ts', expiresIn integer '*:expiresIn', xmlData xml '@mp:xmltext');
+               with(ts datetime '*:ts', expiresIn integer '*:expiresIn');
         
         set @result = @@identity;
     
