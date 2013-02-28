@@ -1,6 +1,6 @@
 create or replace function ch.chest(
     @url long varchar,
-    @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('code'))
+    @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('authorization:'))
 )
 returns xml
 begin
@@ -58,8 +58,8 @@ begin
     
     set @request = http_body();
     
-    if isnull(@request,'') = '' then
-        return ch.responseRootElement('');
+    if isnull(@request,'') = '' and isnull(@url,'') = '' then
+        return ch.responseRootElement(ch.processEmptyRequest());
     end if;
     
     set @UOAuthRoles = util.UOAuthAuthorize(@code); 
@@ -79,9 +79,20 @@ begin
             
         return @response;
     end if;
+    
+    -- parse url
+    if @url is not null then
+        select service
+          into @service
+          from openstring(value @url)
+               with (service long varchar)
+               option(delimited by '/') as t;
+    else
+        set @service = 'chest';
+    end if;
 
     ------------
-    set @service = isnull(left(@url, locate(@url,'/') -1),'chest');
+   -- message 'ch.chest @service = ', @service;
     
     case @service
         when 'chest' then
