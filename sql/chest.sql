@@ -59,7 +59,7 @@ begin
     set @request = http_body();
     
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
-        return ch.responseRootElement(ch.processEmptyRequest());
+        set @service = 'settings';
     end if;
     
     set @UOAuthRoles = util.UOAuthAuthorize(@code); 
@@ -87,7 +87,7 @@ begin
           from openstring(value @url)
                with (service long varchar)
                option(delimited by '/') as t;
-    else
+    elseif @service is null then
         set @service = 'chest';
     end if;
 
@@ -102,7 +102,9 @@ begin
         when 'get' then
             set @response = ch.get(@url);
         when 'put' then
-            set @response = ch.put(@url);        
+            set @response = ch.put(@url);
+        when 'settings' then
+            set @response = ch.processEmptyRequest();
     end case;
     
     set @response = ch.responseRootElement(@response);
