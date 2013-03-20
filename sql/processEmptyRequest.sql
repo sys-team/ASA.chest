@@ -1,4 +1,6 @@
-create or replace function ch.processEmptyRequest()
+create or replace function ch.processEmptyRequest(
+    @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('authorization:'))
+)
 returns xml
 begin
 
@@ -61,6 +63,14 @@ begin
             )
     ));
     
+    set @result = (select xmlelement('d' , xmlattributes ('STGTSettings' as "name"),
+                                           xmlagg(if r.[key] is not null
+                                                  then xmlelement('string', xmlattributes(r.[key] as "name"), r.value)
+                                                  else t.xmldatum endif))
+                    from openxml(@result,'/*/*') 
+                         with (name varchar(32) '@name', xmldatum xml '@mp:xmltext' ) as t
+                                left outer join uac.roleData(@code,'STGTSettings') as r on t.name = r.[key]);
+
     return @result;
     
 end;
