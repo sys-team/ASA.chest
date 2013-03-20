@@ -65,7 +65,10 @@ begin
     
     set @result = (select xmlelement('d' , xmlattributes ('STGTSettings' as "name"),
                                            xmlagg(if r.[key] is not null
-                                                  then xmlelement('string', xmlattributes(r.[key] as "name"), r.value)
+                                                  then xmlelement(if isnumeric(r.value) = 1
+                                                                  then 'double'
+                                                                  else 'string' endif
+                                                     , xmlattributes(r.[key] as "name"), r.value)
                                                   else t.xmldatum endif))
                     from openxml(@result,'/*/*') 
                          with (name varchar(32) '@name', xmldatum xml '@mp:xmltext' ) as t

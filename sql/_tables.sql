@@ -125,5 +125,16 @@ comment on table ch.relationshipLog is 'Relationship log'
 create index xk_relationshipLog_relationshipXid on ch.relationshipLog(relationshipXid)
 ;
 
+create table ch.property(
+    
+    name varchar(255) not null unique,
+    type varchar(255) not null,
+    
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.property is 'Property datatype'
+;
 
 
