@@ -138,3 +138,14 @@ comment on table ch.property is 'Property datatype'
 ;
 
 
+create table ch.entityProperty(
+    
+    entity STRING not null,
+    property STRING not null,
+    
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.entityProperty is 'Entity properties list'
+;
