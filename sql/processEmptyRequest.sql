@@ -27,11 +27,6 @@ begin
             )
             
             , xmlelement(
-                'date'
-                , xmlattributes ('ts' as "name")
-                , left(current utc timestamp, 19) + ' +0000'
-            )
-            , xmlelement(
                 'double'
                 , xmlattributes ('distanceFilter' as "name")
                 , 20
