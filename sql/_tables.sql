@@ -125,6 +125,7 @@ create table ch.entityProperty(
     
     entity STRING not null,
     property STRING not null,
+    type varchar(255),
     
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)

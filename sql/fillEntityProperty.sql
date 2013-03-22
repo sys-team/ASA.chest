@@ -14,10 +14,13 @@ begin
         insert into ch.entityProperty with auto name
         select distinct
                c_name as entity,
-               t.property
-          from ch.entity e outer apply (select property
+               t.property,
+               t.type
+          from ch.entity e outer apply (select property,
+                                               type
                                           from openxml(e.xmlData, '/*:d/*')
-                                              with(property long varchar '@name')) as t
+                                               with(property long varchar '@name', type long varchar '@mp:localname')
+                                         where type not in ('d')) as t
          where e.name = c_name
            and t.property is not null
            and not exists (select *
