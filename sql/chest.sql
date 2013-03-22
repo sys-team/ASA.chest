@@ -43,10 +43,7 @@ begin
     if varexists('@UOAuthRoles') = 0 then
         create variable @UOAuthRoles xml;
     end if;
-    
-    if varexists('@accessTokenId') = 0 then
-        create variable @accessTokenId integer;
-    end if;
+
     ------------
     
     set @xid = newid();
@@ -62,15 +59,13 @@ begin
         set @service = 'settings';
     end if;
     
-    set @UOAuthRoles = util.UOAuthAuthorize(@code); 
+    set @UOAuthRoles = uac.UOAuthAuthorize(@code); 
     -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
     
     set @UOAuthAccount = (select id
                             from openxml(@UOAuthRoles,'/*:response/*:account')
                             with (id integer '*:id'));
                             
-    set @accessTokenId = ch.saveAccessToken(@UOAuthRoles, @code);                            
-
     if @UOAuthAccount is null then
         set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
         update ch.log

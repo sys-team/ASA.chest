@@ -9,7 +9,7 @@ begin
     set inserted.version = isnull(deleted.version,1) + 1;
     
     if varexists('@UOAuthAccount') = 1 then
-        set inserted.lastUser = @UOAuthAccount;
+        set inserted.author = @UOAuthAccount;
     end if;
 
 end
@@ -21,7 +21,7 @@ for each row
 begin
 
     if varexists('@UOAuthAccount') = 1 then
-        set inserted.lastUser = @UOAuthAccount;
+        set inserted.author = @UOAuthAccount;
     end if;
 
 end
@@ -38,7 +38,7 @@ begin
     set inserted.version = isnull(deleted.version,1) + 1;
     
     if varexists('@UOAuthAccount') = 1 then
-        set inserted.lastUser = @UOAuthAccount;
+        set inserted.author = @UOAuthAccount;
     end if;
 
 end
@@ -50,7 +50,7 @@ for each row
 begin
 
     if varexists('@UOAuthAccount') = 1 then
-        set inserted.lastUser = @UOAuthAccount;
+        set inserted.author = @UOAuthAccount;
     end if;
 
 end

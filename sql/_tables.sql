@@ -1,31 +1,14 @@
 grant connect to ch;
 grant dba to ch;
 
-create table ch.accessToken(
-
-    token varchar(1024) not null unique,
-    authSystem varchar(128) not null,
-    tokenTs datetime not null,
-    tokenExpiresIn integer not null,
-    xmlData xml,
-
-    id ID, xid GUID, ts TS, cts CTS,
-    unique (xid), primary key (id)
-
-)
-;
-comment on table ch.accessToken is 'Authorized token'
-;
-
 create table ch.entity(
 
     name varchar(512),
     xmlData xml,
 
     version integer default 1,
-    lastUser integer,
+    not null foreign key(author) references uac.account,
     
-    not null foreign key(accessToken) references ch.accessToken,
 
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
@@ -45,7 +28,7 @@ create table ch.relationship(
     xmlData xml,
     
     version integer default 1,
-    lastUser integer,
+    not null foreign key(author) references uac.account,
     
     not null foreign key(parent) references ch.entity on delete cascade,
     not null foreign key(child) references ch.entity on delete cascade,
@@ -148,4 +131,17 @@ create table ch.entityProperty(
 )
 ;
 comment on table ch.entityProperty is 'Entity properties list'
+;
+
+create table ch.entityRole(
+
+    entity STRING not null,
+    actor STRING not null,
+    name STRING not null,
+    
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.entityRole is 'Entity roles'
 ;
