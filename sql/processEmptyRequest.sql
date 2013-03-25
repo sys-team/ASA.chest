@@ -56,6 +56,21 @@ begin
                 , xmlattributes ('syncServerURI' as "name")
                 , 'https://system.unact.ru/asa/?_host=asa0&_svc=chest'
             )
+            , xmlelement(
+                'double'
+                , xmlattributes ('trackerAutoStart' as "name")
+                , 1
+            )
+            , xmlelement(
+                'double'
+                , xmlattributes ('trackerStartTime' as "name")
+                , 8
+            )
+            , xmlelement(
+                'double'
+                , xmlattributes ('trackerFinishTime' as "name")
+                , 20
+            )
     ));
     
     set @result = (select xmlelement('d' , xmlattributes ('STGTSettings' as "name"),
