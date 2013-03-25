@@ -29,12 +29,12 @@ begin
             , xmlelement(
                 'double'
                 , xmlattributes ('distanceFilter' as "name")
-                , 20
+                , 30
             )
             , xmlelement(
                 'double'
                 , xmlattributes ('timeFilter' as "name")
-                , 15
+                , 20
             )
             , xmlelement(
                 'double'
