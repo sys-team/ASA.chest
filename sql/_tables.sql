@@ -1,9 +1,10 @@
 grant connect to ch;
 grant dba to ch;
+comment on user ch is 'Chest service objects owner';
 
 create table ch.entity(
 
-    name varchar(512),
+    name varchar(512) not null,
     xmlData xml,
 
     version integer default 1,
@@ -110,28 +111,30 @@ create index xk_relationshipLog_relationshipXid on ch.relationshipLog(relationsh
 
 create table ch.property(
     
-    name varchar(255) not null unique,
-    type varchar(255) not null,
+    name varchar(512) not null unique,
+    type varchar(512) not null,
+    initial long varchar,
     
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
 ;
-comment on table ch.property is 'Property datatype'
+comment on table ch.property is 'Property'
 ;
-
 
 create table ch.entityProperty(
     
-    entity STRING not null,
-    property STRING not null,
-    type varchar(255),
+    entity varchar(512) not null,
+    property varchar(512) not null,
+    initial long varchar,
     
+    foreign key(property) references ch.property(name),
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
 ;
-comment on table ch.entityProperty is 'Entity properties list'
+comment on table ch.entityProperty is 'Entity properties'
 ;
 
 create table ch.entityRole(
