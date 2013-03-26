@@ -16,7 +16,11 @@ begin
                         name varchar(32) '@name'
                         , xmldatum xml '@mp:xmltext'
                     ) where name not in (
-                        'ts', 'distanceFilter', 'requiredAccuracy', 'timeFilter', 'syncInterval', 'fetchLimit', 'syncServerURI'
+                        'ts'
+                        , 'distanceFilter', 'requiredAccuracy', 'timeFilter'
+                        , 'syncInterval', 'fetchLimit', 'syncServerURI'
+                        , 'trackerAutoStart', 'trackerStartTime',
+                        , 'trackerFinishTime'
                     )
                     
                 ) as xmlData
@@ -54,7 +58,7 @@ begin
             , xmlelement(
                 'string'
                 , xmlattributes ('syncServerURI' as "name")
-                , 'https://system.unact.ru/asa/?_host=asa0&_svc=chest'
+                , 'https://asa0.unact.ru/chest'
             )
             , xmlelement(
                 'double'
