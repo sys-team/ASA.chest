@@ -19,7 +19,7 @@ begin
                         'ts'
                         , 'distanceFilter', 'requiredAccuracy', 'timeFilter'
                         , 'syncInterval', 'fetchLimit', 'syncServerURI'
-                        , 'trackerAutoStart', 'trackerStartTime',
+                        , 'trackerAutoStart', 'trackerStartTime'
                         , 'trackerFinishTime'
                     )
                     
