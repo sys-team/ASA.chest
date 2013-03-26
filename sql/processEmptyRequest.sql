@@ -33,12 +33,12 @@ begin
             , xmlelement(
                 'double'
                 , xmlattributes ('distanceFilter' as "name")
-                , 30
+                , 35
             )
             , xmlelement(
                 'double'
                 , xmlattributes ('timeFilter' as "name")
-                , 20
+                , 25
             )
             , xmlelement(
                 'double'
