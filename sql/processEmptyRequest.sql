@@ -68,12 +68,12 @@ begin
             , xmlelement(
                 'double'
                 , xmlattributes ('trackerStartTime' as "name")
-                , 8
+                , 7
             )
             , xmlelement(
                 'double'
                 , xmlattributes ('trackerFinishTime' as "name")
-                , 20
+                , 21
             )
     ));
     
