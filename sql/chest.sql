@@ -66,6 +66,10 @@ begin
                             from openxml(@UOAuthRoles,'/*:response/*:account')
                             with (id integer '*:id'));
                             
+    update ch.log
+       set account = @UOAuthAccount
+    where xid = @xid;
+                   
     if @UOAuthAccount is null then
         set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
         update ch.log
