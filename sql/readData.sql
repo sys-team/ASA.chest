@@ -21,7 +21,10 @@ begin
       with(xid long varchar '@xid', name long varchar '@name', xmlData xml '@mp:xmltext') as t
      where not exists(select *
                         from #entity
-                       where xid = util.strtoxid(t.xid));
+                       where xid = util.strtoxid(t.xid))
+       and not exists (select *
+                         from ch.entity
+                        where xid =  util.strtoxid(t.xid));
                        
     --message 'ch.readData #2';
     
