@@ -100,8 +100,8 @@ begin
             set @response = ch.makeAnswer();
         when 'get' then
             set @response = ch.get(@url);
-        when 'put' then
-            set @response = ch.put(@url);
+        --when 'put' then
+            --set @response = ch.put(@url);
         when 'settings' then
             set @response = ch.processEmptyRequest();
     end case;
