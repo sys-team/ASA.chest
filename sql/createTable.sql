@@ -14,7 +14,7 @@ begin
         where name = @entity
             or @entity is null
     do  
-        set @sql = 'drop table if exists ch.'+@name;
+        set @sql = 'drop table if exists ch.['+@name+']';
         
         execute immediate @sql;
         
@@ -34,11 +34,11 @@ begin
         );
         
         set @sql =
-            'create global temporary table ch.' + @name + '('
+            'create global temporary table ch.['+@name+'] ('
             + 'id ID, '
-            + if @columns = '' then '' else @columns + ', ' endif
             + if @roles = '' then '' else @roles + ', ' endif
-            + 'xid GUID, ts TS, cts CTS, primary key(id), unique(xid)'
+            + if @columns = '' then '' else @columns + ', ' endif
+            + 'version int, author IDREF, xid GUID, ts TS, cts CTS, primary key(id), unique(xid)'
             +') not transactional share by all'
         ;
         
