@@ -55,6 +55,8 @@ begin
     
     set @request = http_body();
     
+    set @request = csconvert(@request,'db_charset','utf-8');
+    
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
         set @service = 'settings';
     end if;
