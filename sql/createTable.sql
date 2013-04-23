@@ -1,5 +1,6 @@
 create or replace procedure ch.createTable(
-    @entity long varchar
+    @entity long varchar,
+    @owner varchar(128) default 'ch'
 )
 begin
 
@@ -9,12 +10,12 @@ begin
     
     for lloop as ccur cursor for
     select distinct
-           name as @name
-        from ch.entity
-        where name = @entity
+           entity as @name
+        from ch.entityProperty
+        where entity = @entity
             or @entity is null
     do  
-        set @sql = 'drop table if exists ch.['+@name+']';
+        set @sql = 'drop table if exists ['+@owner+'].['+@name+']';
         
         execute immediate @sql;
         
@@ -34,7 +35,7 @@ begin
         );
         
         set @sql =
-            'create global temporary table ch.['+@name+'] ('
+            'create global temporary table ['+@owner+'].['+@name+'] ('
             + 'id ID, '
             + if @roles = '' then '' else @roles + ', ' endif
             + if @columns = '' then '' else @columns + ', ' endif
@@ -42,6 +43,7 @@ begin
             +') not transactional share by all'
         ;
         
+        message @sql to client;
         execute immediate @sql;
         
     end for;   
