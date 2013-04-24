@@ -149,3 +149,16 @@ create table ch.entityRole(
 ;
 comment on table ch.entityRole is 'Entity roles'
 ;
+
+
+create table ch.persistEntityData(
+
+    entity STRING not null unique,
+    persistTs datetime,
+    
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.persistEntityData is 'State of entity persist'
+;
