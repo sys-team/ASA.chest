@@ -10,6 +10,7 @@ begin
     declare @errorCode long varchar;
     declare @xid GUID;
     declare @service long varchar;
+    declare @charSet long varchar;
     
     declare local temporary table #entity(
         name varchar(512),
@@ -54,6 +55,11 @@ begin
            @code as code;
     
     set @request = http_body();
+    
+    set @charSet = util.xmlCharset(@request);
+    if @charSet is not null then
+        set @request = csconvert(@request,'db_charset', @charSet);
+    end if;
     
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
         set @service = 'settings';
