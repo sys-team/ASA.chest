@@ -1,6 +1,7 @@
 create or replace procedure ch.createTable(
     @entity long varchar,
-    @owner varchar(128) default 'ch'
+    @owner varchar(128) default 'ch',
+    @isTemporary integer default 1
 )
 begin
 
@@ -20,7 +21,7 @@ begin
         execute immediate @sql;
         
         set @columns = (
-            select list(p.name+' '+p.type, ', ')
+            select list(ch.remoteColumnName(p.name) + ' '+p.type, ', ')
             from 
                 ch.entityProperty ep
                 join ch.property p
@@ -35,16 +36,26 @@ begin
         );
         
         set @sql =
-            'create global temporary table ['+@owner+'].['+@name+'] ('
+            'create ' + if @isTemporary = 1 then 'global temporary ' else '' endif
+            + 'table ['+@owner+'].['+@name+'] ('
             + 'id ID, '
             + if @roles = '' then '' else @roles + ', ' endif
             + if @columns = '' then '' else @columns + ', ' endif
             + 'version int, author IDREF, xid GUID, ts TS, cts CTS, primary key(id), unique(xid)'
-            +') not transactional share by all'
+            +') ' + if @isTemporary = 1 then 'not transactional share by all' else '' endif
         ;
         
-        message @sql to client;
+        --message 'ch.createTable @sql = ', @sql;
         execute immediate @sql;
+        
+        if @isTemporary = 0 then
+            set @sql = 'create index [xk_' + @owner + '_' + @name + '_ts]' +
+                        ' on [' + @owner + '].[' + @name + '](ts)';
+                        
+            --message 'ch.createTable @sql = ', @sql;
+            execute immediate @sql;
+        
+        end if;
         
     end for;   
 
