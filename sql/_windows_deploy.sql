@@ -15,6 +15,7 @@ read c:\\sites\\ASA.chest\\sql\\get.sql;
 read c:\\sites\\ASA.chest\\sql\\makeAnswer.sql;
 read c:\\sites\\ASA.chest\\sql\\parseVariables.sql;
 read c:\\sites\\ASA.chest\\sql\\persistData.sql;
+read c:\\sites\\ASA.chest\\sql\\persistData_event.sql;
 read c:\\sites\\ASA.chest\\sql\\processEmptyRequest.sql;
 read c:\\sites\\ASA.chest\\sql\\readData.sql;
 read c:\\sites\\ASA.chest\\sql\\remoteColumnName.sql;
