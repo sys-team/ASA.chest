@@ -1,5 +1,4 @@
 create or replace procedure ch.persistData(
-    @startTs datetime,
     @owner varchar(128) default 'ch',
     @entity long varchar default null
 )
@@ -23,16 +22,15 @@ begin
                      and u.user_name = @owner
                      and t.table_type in ('BASE', 'GBL TEMP')) then
                      
-            set @ts = greater(@startTs,
-                             isnull((select persistTs
-                                       from ch.persistEntityData
-                                      where entity = c_entity), '1971-07-25'));
+            set @ts = isnull((select persistTs
+                                from ch.persistEntityData
+                               where entity = c_entity), '1971-07-25');
                      
             set @sql = 'insert into [' + @owner + '].[' + c_entity + '] on existing update with auto name ' +
                        ch.entitySql(c_entity) +
                        ' and e.ts between ''' + cast(@ts as varchar(24)) +''' and ''' + cast(@ets as varchar(24)) +'''';
                        
-            -- message 'ch.persistData @sql = ', @sql;
+            --message 'ch.persistData @sql = ', @sql;
             
             execute immediate @sql;
             
@@ -42,7 +40,9 @@ begin
                      where entity = c_entity) as id,
                    c_entity as entity,
                    @ets as persistTs;
-            
+                   
+            -- message 'ch.persistData @sql = ', @sql;
+                
             commit;
                      
         end if;
