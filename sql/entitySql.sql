@@ -12,9 +12,9 @@ begin
             select    
                 'select e.id ' as f
             union select nullif(
-                (select list('(select c.id as [' + r.name + '] '+
+                (select list('(select c.id '+
                         'from ch.relationship r join ch.entity c on r.child = c.id ' +
-                        ' where r.parent = e.id and c.name = ''' + r.actor +''') ')
+                        ' where r.parent = e.id and c.name = ''' + r.actor +''') as [' + r.name + '] ')
                     from ch.entityRole r
                     where entity = @entity
                 ),

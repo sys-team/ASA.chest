@@ -1,7 +1,8 @@
 create or replace procedure ch.createTable(
     @entity long varchar,
     @owner varchar(128) default 'ch',
-    @isTemporary integer default 1
+    @isTemporary integer default 1,
+    @forseDrop integer default 0
 )
 begin
 
@@ -15,11 +16,23 @@ begin
         from ch.entityProperty
         where entity = @entity
             or @entity is null
-    do  
-        set @sql = 'drop table if exists ['+@owner+'].['+@name+']';
-        
-        execute immediate @sql;
-        
+    do
+    
+        if exists(select *
+                    from sys.systable t join sys.sysuserperm u on t.creator = u.user_id
+                   where t.table_name = @name
+                     and u.user_name = @owner
+                     and t.table_type in ('BASE', 'GBL TEMP')) and @forseDrop = 0 then
+                     
+            raiserror 55555 'Table %1!.%2! exists! use forseDrop option to regenerate', @owner, @name;
+            return;
+        else
+    
+            set @sql = 'drop table if exists ['+@owner+'].['+@name+']';
+            execute immediate @sql;
+            
+        end if;
+           
         set @columns = (
             select list(ch.remoteColumnName(p.name) + ' '+p.type, ', ')
             from 
@@ -54,7 +67,19 @@ begin
                         
             --message 'ch.createTable @sql = ', @sql;
             execute immediate @sql;
-        
+                        
+            if exists (select *
+                         from ch.entityProperty
+                        where entity = @name
+                          and property = 'ts') then
+                        
+                set @sql = 'create index [xk_' + @owner + '_' + @name + '_remoteTs]' +
+                            ' on [' + @owner + '].[' + @name + '](remoteTs)';
+                            
+                --message 'ch.createTable @sql = ', @sql;
+                execute immediate @sql;
+                
+            end if;
         end if;
         
     end for;   

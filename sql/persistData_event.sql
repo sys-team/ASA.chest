@@ -11,7 +11,7 @@ begin
         return;
     end if;
     
-    call  ch.persistData('2013-04-01', 'cht');
+    call  ch.persistData('cht');
 
     exception  
     when others then
