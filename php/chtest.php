@@ -29,39 +29,57 @@
         
         return($ret);
     }
+    
+    if ($_REQUEST['url'] == '' || $_REQUEST['code'] == '') {
+        echo('URL and auth code requred');
+        return;
+    }
 
-    $chestUrl = $_REQUEST['url'];
+    $chestUrl = $_REQUEST['url'].'?authorization:='.$_REQUEST['code'];
     $numPosts = $_REQUEST['cnt'];
-    $authCode = $_REQUEST['code'];
+    $postSize = $_REQUEST['size'];
     
-    date_default_timezone_set('UTC');
-    
+    if ($numPosts == '') {
+        $numPosts = 10;
+    }
+    if ($postSize == '') {
+        $postSize = 1;
+    }
+
     // creating test data
     $postData = array();
     
     $xml = new DomDocument('1.0');
     $root = $xml -> appendChild($xml -> createElement('post'));
-    $d = $root -> appendChild($xml -> createElement('d'));
-    $attrName = $xml -> createAttribute('name');
-    $attrName -> value = 'chtest';
-    $d -> appendChild($attrName);
+
         
     for ($i = 0; $i < $numPosts; $i++) {
     
-        $attrXid = $xml -> createAttribute('xid');
-        $attrXid -> value = guid();
-        $d -> appendChild($attrXid);
+        for ($j = 0; $j < $postSize; $j ++) {
+
+            $d = $root -> appendChild($xml -> createElement('d'));
+            $attrName = $xml -> createAttribute('name');
+            $attrName -> value = 'chTest';
+            $d -> appendChild($attrName);
+        
+            $attrXid = $xml -> createAttribute('xid');
+            $attrXid -> value = guid();
+            $d -> appendChild($attrXid);
+        }
         
         $postData[$i] = $xml -> saveXml();
     }
     
-    echo('Testing ASA.chest service at '.$chestUrl);
-    
-    echo(' Start time = '.date('Y-m-d H:i:s'));  
+    $startTime = microtime(true);
     
     for ($i = 0; $i < $numPosts; $i++) {
-        $result = postData($chestUrl.'?authorization:='.$authCode, $postData[$i]);        
+        $result = postData($chestUrl, $postData[$i]);        
     }
     
-    echo(' End time = '.date('Y-m-d H:i:s'));  
+    $endTime = microtime(true);
+    
+    $speed = round($numPosts/($endTime - $startTime), 3);
+    
+    echo('ASA.chest posts = '.$numPosts.' post size = '.$postSize.' speed = '.$speed.' posts/sec');
+    
 ?>
