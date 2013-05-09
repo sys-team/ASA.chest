@@ -5,6 +5,28 @@ returns xml
 begin
 
     declare @result xml;
+    declare @isPushAuth BOOL;
+    
+    set @isPushAuth = 0;
+    
+    if exists (
+        select 1 where uac.account(@code) regexp '.*(@upushauth)$'
+    ) then
+        
+        set @isPushAuth = 1;
+        
+        set @result = (
+            select top 1 xmldata
+            from ch.entity
+            where author = uac.account(@code)
+            where name = 'STGTSettings'
+        );
+        
+    end if;
+    
+    if @result is not null then
+        return @result;
+    end if;
     
     set @result = xmlelement('d'
         , xmlattributes ('STGTSettings' as "name")
@@ -33,12 +55,12 @@ begin
             , xmlelement(
                 'double'
                 , xmlattributes ('distanceFilter' as "name")
-                , 35
+                , if @isPushAuth = 1 then 15 else 35 endif
             )
             , xmlelement(
                 'double'
                 , xmlattributes ('timeFilter' as "name")
-                , 25
+                , if @isPushAuth = 1 then 10 else 25 endif
             )
             , xmlelement(
                 'double'
@@ -63,7 +85,7 @@ begin
             , xmlelement(
                 'double'
                 , xmlattributes ('trackerAutoStart' as "name")
-                , 1
+                , if @isPushAuth = 1 then 0 else 1 endif
             )
             , xmlelement(
                 'double'
@@ -77,16 +99,26 @@ begin
             )
     ));
     
-    set @result = (select xmlelement('d' , xmlattributes ('STGTSettings' as "name"),
-                                           xmlagg(if r.[key] is not null
-                                                  then xmlelement(if isnumeric(r.value) = 1
-                                                                  then 'double'
-                                                                  else 'string' endif
-                                                     , xmlattributes(r.[key] as "name"), r.value)
-                                                  else t.xmldatum endif))
-                    from openxml(@result,'/*/*') 
-                         with (name varchar(32) '@name', xmldatum xml '@mp:xmltext' ) as t
-                                left outer join uac.roleData(@code,'STGTSettings') as r on t.name = r.[key]);
+    set @result = (
+        select
+            xmlelement('d'
+                , xmlattributes ('STGTSettings' as "name")
+                , xmlagg(
+                    if r.[key] is not null
+                    then xmlelement(
+                        if isnumeric(r.value) = 1
+                        then 'double'
+                        else 'string' endif,
+                        xmlattributes(r.[key] as "name"), r.value)
+                    else t.xmldatum endif
+                )
+            )
+        from openxml(@result,'/*/*') with (
+                name varchar(32) '@name',
+                xmldatum xml '@mp:xmltext'
+            ) as t
+        left outer join uac.roleData(@code,'STGTSettings') as r on t.name = r.[key]
+    );
 
     return @result;
     
