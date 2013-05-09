@@ -19,7 +19,8 @@ begin
             select top 1 xmldata
             from ch.entity
             where author = uac.account(@code)
-            where name = 'STGTSettings'
+              and name = 'STGTSettings'
+            order by ts desc
         );
         
     end if;
