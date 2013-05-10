@@ -6,14 +6,19 @@ begin
     -- entities
     insert into #entity with auto name
         select
-            isnull(util.strtoxid(xid),newid()) as xid,
+            coalesce(
+                util.strtoxid(xid),
+                (select top 1 xid from ch.entity where name=e.name and code=e.code order by id desc),
+                (select top 1 xid from ch.entity where name=e.name order by id desc),
+                newid()
+            ) as xid,
             name,
             xmlData
         from openxml(@request, '/*/*:d') with (
             xid long varchar '@xid',
             name long varchar '@name',
             xmlData xml '@mp:xmltext'
-        )
+        ) e
     ;
     
     --message 'ch.readData #1';
@@ -21,9 +26,9 @@ begin
     -- entities from rel
     insert into #entity with auto name
         select distinct
-            isnull(util.strtoxid(xid),newid()) as xid,
+            util.strtoxid(xid) as xid,
             name,
-            xmlData
+            null as xmlData
         from openxml(@request, '/*/*:d/*:d') with (
                 xid long varchar '@xid',
                 name long varchar '@name',
