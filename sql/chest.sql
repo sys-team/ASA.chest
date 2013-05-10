@@ -15,6 +15,7 @@ begin
     declare local temporary table #entity(
         name varchar(512),
         xid GUID,
+        code varchar(512),
         xmlData xml,
         primary key(xid)
     );

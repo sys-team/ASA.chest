@@ -9,14 +9,15 @@ begin
             coalesce(
                 util.strtoxid(xid),
                 (select top 1 xid from ch.entity where name=e.name and code=e.code order by id desc),
-                (select top 1 xid from ch.entity where name=e.name order by id desc),
                 newid()
             ) as xid,
             name,
+            code,
             xmlData
         from openxml(@request, '/*/*:d') with (
             xid long varchar '@xid',
             name long varchar '@name',
+            code long varchar '@code',
             xmlData xml '@mp:xmltext'
         ) e
     ;
