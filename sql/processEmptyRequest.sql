@@ -24,7 +24,9 @@ begin
             order by ts desc
         );
         
-    else
+    end if;
+    
+    if @result is null then
     
         set @result = xmlelement('d'
             , xmlattributes ('STGTSettings' as "name")
