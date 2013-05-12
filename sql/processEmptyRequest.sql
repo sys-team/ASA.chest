@@ -9,8 +9,9 @@ begin
     
     set @isPushAuth = 0;
     
+
     if exists (
-        select 1 where uac.account(@code) regexp '.*(@upushauth)$'
+        select 1 where uac.account(@code, 'code') regexp '.*(@upushauth)$'
     ) then
         
         set @isPushAuth = 1;
@@ -23,82 +24,80 @@ begin
             order by ts desc
         );
         
-    end if;
+    else
     
-    if @result is not null then
-        return @result;
-    end if;
-    
-    set @result = xmlelement('d'
-        , xmlattributes ('STGTSettings' as "name")
-        , xmlconcat(
-            
-            (select top 1 (
-                select xmlagg(xmldatum)
-                    from openxml(xmlData,'*/*') with (
-                        name varchar(32) '@name'
-                        , xmldatum xml '@mp:xmltext'
-                    ) where name not in (
-                        'ts'
-                        , 'distanceFilter', 'requiredAccuracy', 'timeFilter'
-                        , 'syncInterval', 'fetchLimit', 'syncServerURI'
-                        , 'trackerAutoStart', 'trackerStartTime'
-                        , 'trackerFinishTime'
-                    )
-                    
-                ) as xmlData
+        set @result = xmlelement('d'
+            , xmlattributes ('STGTSettings' as "name")
+            , xmlconcat(
                 
-                from ch.entity
-                where name = 'STGTSettings'
-                order by id
-            )
-            
-            , xmlelement(
-                'double'
-                , xmlattributes ('distanceFilter' as "name")
-                , if @isPushAuth = 1 then 15 else 35 endif
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('timeFilter' as "name")
-                , if @isPushAuth = 1 then 10 else 25 endif
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('requiredAccuracy' as "name")
-                , 20
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('fetchLimit' as "name")
-                , 20
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('syncInterval' as "name")
-                , 240
-            )
-            , xmlelement(
-                'string'
-                , xmlattributes ('syncServerURI' as "name")
-                , 'https://asa0.unact.ru/chest'
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('trackerAutoStart' as "name")
-                , if @isPushAuth = 1 then 0 else 1 endif
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('trackerStartTime' as "name")
-                , 7
-            )
-            , xmlelement(
-                'double'
-                , xmlattributes ('trackerFinishTime' as "name")
-                , 21
-            )
-    ));
+                (select top 1 (
+                    select xmlagg(xmldatum)
+                        from openxml(xmlData,'*/*') with (
+                            name varchar(32) '@name'
+                            , xmldatum xml '@mp:xmltext'
+                        ) where name not in (
+                            'ts'
+                            , 'distanceFilter', 'requiredAccuracy', 'timeFilter'
+                            , 'syncInterval', 'fetchLimit', 'syncServerURI'
+                            , 'trackerAutoStart', 'trackerStartTime'
+                            , 'trackerFinishTime'
+                        )
+                        
+                    ) as xmlData
+                    
+                    from ch.entity
+                    where name = 'STGTSettings'
+                    order by id
+                )
+                
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('distanceFilter' as "name")
+                    , if @isPushAuth = 1 then 15 else 35 endif
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('timeFilter' as "name")
+                    , if @isPushAuth = 1 then 10 else 25 endif
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('requiredAccuracy' as "name")
+                    , 20
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('fetchLimit' as "name")
+                    , 20
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('syncInterval' as "name")
+                    , 240
+                )
+                , xmlelement(
+                    'string'
+                    , xmlattributes ('syncServerURI' as "name")
+                    , 'https://asa0.unact.ru/chest'
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('trackerAutoStart' as "name")
+                    , if @isPushAuth = 1 then 0 else 1 endif
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('trackerStartTime' as "name")
+                    , 7
+                )
+                , xmlelement(
+                    'double'
+                    , xmlattributes ('trackerFinishTime' as "name")
+                    , 21
+                )
+        ));
+        
+    end if;
     
     set @result = (
         select
