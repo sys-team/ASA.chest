@@ -1,5 +1,6 @@
 <?php
-    error_reporting(E_ALL);
+    //error_reporting(E_ALL);
+    error_reporting(E_ERROR);
 
     define ('XMLNS', 'https://github.com/sys-team/ASA.chest');
     define('CHEST_SERVER', 'https://oldcat.unact.ru/rc_unact_old/chest');
@@ -12,25 +13,27 @@
         $authorization = str_replace('Bearer ', '', $_SERVER['Authorization']);
     
     if (isset($json) && $json != ''){
+
+        chestJSON2XML($json);
         
-        echo($json);
-        
-    } else {
-        
-        $ret = postData (CHEST_SERVER, null, $authorization);
-        $xml = new XMLReader();
-        $xml -> XML($ret);
-        
-        $arr = array();
-        $arr = xml2array ($xml, 'response');
-        
+    } else {        
+        $ret = postData (CHEST_SERVER, null, $authorization);        
     }
     
-    //echo($ret);
+    if (isset($ret)) {
+        $xml = new XMLReader();
+        $xml -> XML($ret);
+        $xml -> setParserProperty(XMLReader::VALIDATE, true);
+        
+
+        if ($xml->isValid()) {
+            $jsonRes = chestXML2JSON ($xml);
+            echo($jsonRes);
+        }
+        $xml -> close();
+    }
     
-    $jsonRes = json_encode ($arr, JSON_NUMERIC_CHECK);
-    echo($jsonRes);
-    
+    ////////////////////////
     function postData ($url, $data, $authorization) {
     
         $ch = curl_init($url);
@@ -45,45 +48,53 @@
         return($ret); 
         
     }
-    
-    function xml2array($xml){ 
+    ////////////////////////
+    function chestXML2JSON($xml){ 
    
         $tree = array();
         
-        while($xml->read()){
-            
-            if($xml -> nodeType == XMLReader::END_ELEMENT)
-                return $tree;
-            else if($xml -> nodeType == XMLReader::ELEMENT){
-                $node = array();
+        while ($xml->read()) {     
+            if ($xml -> nodeType == XMLReader::ELEMENT && $xml -> name == 'd' && $xml -> depth == 1){
                 
-                $node['name'] = $xml -> name;
-                $value = $xml -> readString();
+                $node = array();
+                $property = array();
+                
+                $dXml = new XMLReader();
+                $dXml = $xml;
     
                 if($xml->hasAttributes){
                     while($xml->moveToNextAttribute()) {
-                        $node[$xml->name] = $xml->value;
+                        $node[$xml -> name] = $xml -> value;
                     }
-
                 }
                 
-                if(!$xml -> isEmptyElement)  {
-                    $properties = xml2array($xml);
-                    if ($properties) 
-                        $node['properties'] = $properties;
-                    else
-                        $node['value'] = $value;
-                }                
+                while ($dXml->read()) {
+                    if ($dXml -> nodeType == XMLReader::ELEMENT && $dXml -> name != 'd' && $dXml -> depth == 2){   
+                        $property[$dXml -> getAttribute('name')] =  $dXml -> readString();
+                    }
+                }
+                
+                if ($property) 
+                        $node['property'] = $property;
+                        
+                $dXml -> close();
                 $tree[] = $node;
             }
-            
-            else if($xml -> nodeType == XMLReader::TEXT){
-                continue;
-
-            }
         }
-        return $tree; 
-   }
+        
+        $res = json_encode ($tree, JSON_NUMERIC_CHECK);
+        return $res;
+    }
+    ////////////////////////
+    function chestJSON2XML($json){
+        
+        $data = array();
+        $data = json_decode($json);
+        
+        var_dump($data);
+        
     
+        
+    }
 
 ?>
