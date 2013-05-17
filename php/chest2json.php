@@ -14,10 +14,24 @@
     
     if (isset($json) && $json != ''){
 
-        chestJSON2XML($json);
+        $requestXML = new DOMDocument('1.0', 'utf-8');
+        
+        $jd = json_decode($json, true);
+        
+        if ($jd != null) {
+            $requestXML -> appendChild( $requestXML -> createElementNS( XMLNS, 'post') );
+            chestArray2xml ( $jd['data'], $requestXML -> documentElement);
+        }
+        
+        $request = $requestXML -> saveXML();
+        //var_dump($request);
+        
+        $ret = postData (CHEST_SERVER, $request, $authorization);
+        //var_dump($ret);
         
     } else {        
-        $ret = postData (CHEST_SERVER, null, $authorization);        
+        $ret = postData (CHEST_SERVER, null, $authorization);
+        //var_dump($ret);
     }
     
     if (isset($ret)) {
@@ -27,7 +41,8 @@
         
 
         if ($xml->isValid()) {
-            $jsonRes = chestXML2JSON ($xml);
+            $arrayRes = chestXml2array ($xml, 1);
+            $jsonRes = json_encode ($arrayRes, JSON_NUMERIC_CHECK);
             echo($jsonRes);
         }
         $xml -> close();
@@ -49,18 +64,17 @@
         
     }
     ////////////////////////
-    function chestXML2JSON($xml){ 
+    function chestXml2array($xml, $dLevel){ 
    
         $tree = array();
-        
-        while ($xml->read()) {     
-            if ($xml -> nodeType == XMLReader::ELEMENT && $xml -> name == 'd' && $xml -> depth == 1){
-                
+
+        while ($xml->read()) {
+            
+            if ($xml -> nodeType == XMLReader::ELEMENT && $xml -> name == 'd' && $xml -> depth == 1 && $dLevel == 1){
+
                 $node = array();
                 $property = array();
-                
-                $dXml = new XMLReader();
-                $dXml = $xml;
+
     
                 if($xml->hasAttributes){
                     while($xml->moveToNextAttribute()) {
@@ -68,33 +82,69 @@
                     }
                 }
                 
-                while ($dXml->read()) {
-                    if ($dXml -> nodeType == XMLReader::ELEMENT && $dXml -> name != 'd' && $dXml -> depth == 2){   
-                        $property[$dXml -> getAttribute('name')] =  $dXml -> readString();
-                    }
-                }
+                $property = chestXml2array($xml, 2);
                 
                 if ($property) 
-                        $node['property'] = $property;
+                    $node['property'] = $property;
                         
-                $dXml -> close();
                 $tree[] = $node;
+            } elseif ($xml -> nodeType == XMLReader::ELEMENT && $xml -> name != 'd' && $xml -> depth == 2 && $dLevel == 2) {
+                $tree[$xml -> getAttribute('name')] =  $xml -> readString();
+                $next = chestXml2array($xml, 2);
+                
+                if ($next)
+                    $tree[] = $next;
+                    
+            } elseif ($xml -> nodeType == XMLReader::END_ELEMENT) {
+                return $tree;
             }
-        }
         
-        $res = json_encode ($tree, JSON_NUMERIC_CHECK);
-        return $res;
+        }
+
+        return $tree;
     }
     ////////////////////////
-    function chestJSON2XML($json){
+    function chestArray2xml ( $array, $xmlnode ) {
         
-        $data = array();
-        $data = json_decode($json);
+        $doc = $xmlnode -> ownerDocument;
         
-        var_dump($data);
-        
-    
-        
+        foreach ( $array as $key => $value){
+            $dNode = $xmlnode -> appendChild ( $doc -> createElement ('d'));
+            if (is_array ($value)){
+                foreach($value as $key => $value) {
+                    if (is_array ($value)) {
+                        if ($key == 'property') {
+                            foreach($value as $key => $value) {
+                                $aNode = $dNode -> appendChild
+                                         ( $doc -> createElement (( is_numeric($value) ? 'double' : 'string' ), $value));
+                                $attr = $doc -> createAttribute('name');
+                                $attr -> value = $key;
+                                $aNode -> appendChild($attr);
+                                
+                            }
+                        } elseif ($key == 'role') {
+                            $rNode = $dNode -> appendChild( $doc -> createElement ('d'));
+                            foreach($value as $key => $value) {
+                                $attr = $doc -> createAttribute('name');
+                                $attr -> value = $key;
+                                $rNode -> appendChild($attr);
+                                
+                                $attr = $doc -> createAttribute('xid');
+                                $attr -> value = $value;
+                                $rNode -> appendChild($attr);
+                            }
+                        }
+                        
+                    } else {
+                        if ($key == 'name' || $key == 'xid') {
+                            $attr = $doc -> createAttribute($key);
+                            $attr -> value = $value;
+                            $dNode -> appendChild($attr);    
+                        }
+                    }
+                }
+            }
+        }
     }
 
 ?>
