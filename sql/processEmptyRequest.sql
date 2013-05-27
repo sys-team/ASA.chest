@@ -10,7 +10,7 @@ begin
     set @isPushAuth = 0;
     
     if exists (
-        select 1 where uac.account(@code) regexp '.*(@upushauth)$'
+        select 1 where uac.accountInfo(@code) regexp '.*(@upushauth)$'
     ) then
         
         set @isPushAuth = 1;
