@@ -18,7 +18,7 @@ begin
         set @result = (
             select top 1 xmldata
             from ch.entity
-            where author = uac.account(@code)
+            where author = uac.accountInfo(@code)
               and name = 'STGTSettings'
             order by ts desc
         );
