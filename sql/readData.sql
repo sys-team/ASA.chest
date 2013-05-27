@@ -4,7 +4,7 @@ create or replace procedure ch.readData(
 begin
     
     -- entities
-    insert into #entity with auto name
+    insert into #entity on existing update with auto name
         select
             coalesce(
                 util.strtoxid(xid),
@@ -25,7 +25,7 @@ begin
     --message 'ch.readData #1';
     
     -- entities from rel
-    insert into #entity with auto name
+    insert into #entity on existing update with auto name
         select distinct
             util.strtoxid(xid) as xid,
             name,
@@ -47,7 +47,7 @@ begin
     --message 'ch.readData #2';
     
     -- attributes
-    insert into #attribute with auto name
+    insert into #attribute on existing update with auto name
         select
             c.name,
             c.dataType,
@@ -66,7 +66,7 @@ begin
     ;
     
     -- rels
-    insert into #rel with auto name
+    insert into #rel on existing update with auto name
         select
             util.strtoxid(c.xid) as childXid,
             e.xid as parentXid,
