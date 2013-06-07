@@ -7,6 +7,7 @@ begin
               from ch.entity
              where xid = #entity.xid) as id,
            name,
+           code,
            xmlData,
            xid
       from #entity

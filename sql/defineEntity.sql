@@ -4,6 +4,10 @@ create or replace procedure ch.defineEntity (
     @roles text
 ) begin
 
+    delete ch.entityProperty
+        where @name = entity
+    ;
+
     insert into ch.entityProperty on existing update with auto name
         select
             (select id from ch.entityProperty
@@ -14,6 +18,10 @@ create or replace procedure ch.defineEntity (
         from openstring(
             value @properties
         ) with ([property] text) option(ROW DELIMITED BY ':') as cols
+    ;
+
+    delete ch.entityRole
+        where @name = entity
     ;
 
     insert into ch.entityRole on existing update with auto name

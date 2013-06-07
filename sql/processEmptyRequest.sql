@@ -11,7 +11,7 @@ begin
     
 
     if exists (
-        select 1 where uac.account(@code, 'code') regexp '.*(@upushauth)$'
+        select 1 where uac.accountInfo(@code) regexp '.*(@upushauth)$'
     ) then
         
         set @isPushAuth = 1;
@@ -19,7 +19,7 @@ begin
         set @result = (
             select top 1 xmldata
             from ch.entity
-            where author = uac.account(@code)
+            where author = uac.accountInfo(@code)
               and name = 'STGTSettings'
             order by ts desc
         );

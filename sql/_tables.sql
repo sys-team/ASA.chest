@@ -5,6 +5,7 @@ comment on user ch is 'Chest service objects owner';
 create table ch.entity(
 
     name varchar(512) not null,
+    code varchar(512) null,
     xmlData xml,
 
     version integer default 1,
@@ -18,6 +19,8 @@ create table ch.entity(
 ;
 comment on table ch.entity is 'Entity data'
 ;
+
+create unique index ch_entity_named_code on ch.entity (name,code);
 
 create table ch.relationship(
 
