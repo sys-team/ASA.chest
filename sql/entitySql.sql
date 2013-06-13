@@ -1,5 +1,6 @@
 create or replace function ch.entitySql (
-    @entity long varchar
+    @entity long varchar,
+    @dateConversion integer default 0
 )
 returns long varchar
 begin
@@ -46,18 +47,22 @@ begin
             + (select list(
                     + if p.initial is not null
                         then 'isnull('
+                            + if @dateConversion = 1 and p.type like'date%' then 'util.iOSTimestamp2DB(' else '' endif
                             + '[' + ch.remoteColumnName(ep.property) + ']'
+                            + if @dateConversion = 1 and p.type like'date%' then ')' else '' endif
                             +', '+p.initial+') as '
                         else ''
                     endif
+                    + if @dateConversion = 1 and p.type like'date%' then 'util.iOSTimestamp2DB(' else '' endif
                     + '[' + ch.remoteColumnName(ep.property) + ']'
+                    + if @dateConversion = 1 and p.type like'date%' then ') as ' + '[' + ch.remoteColumnName(ep.property) + ']' else '' endif
                 ) from ch.entityProperty ep join ch.property p
                 where entity = @entity
             )
             + ' from openxml(e.xmlData, ''/*:d'') with( '
             + (select list(
                     '[' + ch.remoteColumnName(ep.property)
-                    + '] ' + p.type
+                    + '] ' + if p.type like 'date%' then 'string' else p.type endif
                     + ' ''*[@name="' + ep.property + '"]'''
                 ) from ch.entityProperty ep join ch.property p
                 where entity = @entity

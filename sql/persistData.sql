@@ -27,7 +27,7 @@ begin
                                where entity = c_entity), '1971-07-25');
                      
             set @sql = 'insert into [' + @owner + '].[' + c_entity + '] on existing update with auto name ' +
-                       ch.entitySql(c_entity) +
+                       ch.entitySql(c_entity, 1) +
                        ' and e.ts between ''' + cast(@ts as varchar(24)) +''' and ''' + cast(@ets as varchar(24)) +'''';
                        
             --message 'ch.persistData @sql = ', @sql;
@@ -45,7 +45,7 @@ begin
                 
             commit;
                      
-        end if;
+        end if;  
 
     end for;
 
