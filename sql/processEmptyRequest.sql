@@ -65,7 +65,7 @@ begin
                 , xmlelement(
                     'double'
                     , xmlattributes ('requiredAccuracy' as "name")
-                    , 20
+                    , 50
                 )
                 , xmlelement(
                     'double'
