@@ -5,6 +5,7 @@ create global temporary table ch.log(
     code varchar(1024),
     url long varchar,
     httpBody long varchar default http_body(),
+    httpBodyXML xml,
     callerIP varchar(128) default connection_property('ClientNodeAddress'),
     
     account integer,

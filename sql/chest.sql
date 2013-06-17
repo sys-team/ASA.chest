@@ -49,13 +49,22 @@ begin
     ------------
     
     set @xid = newid();
+    set @request = http_body();
     
     insert into ch.log with auto name
     select @xid as xid,
            @url as url,
-           @code as code;
+           @code as code,
+           if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
+           if util.isXML(@request) = 0 then @request else null endif as httpBody;
+           
+         
+    if util.isXML(@request) = 1 then
+        update ch.log
+           set httpBodyXML = @request
+         where xid = @xid;
+    end if;
     
-    set @request = http_body();
     
     set @charSet = util.xmlCharset(@request);
     if @charSet is not null then
