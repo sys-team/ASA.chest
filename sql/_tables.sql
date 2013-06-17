@@ -153,6 +153,21 @@ create table ch.entityRole(
 comment on table ch.entityRole is 'Entity roles'
 ;
 
+create table ch.dataSource(
+
+    entity STRING not null,
+    dataSource STRING,
+    type STRING,
+    FKDataSource STRING,
+    FKType STRING,
+    
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+
+)
+;
+comment on table ch.dataSource is 'Entity data source'
+;
 
 create table ch.persistEntityData(
 
@@ -165,3 +180,5 @@ create table ch.persistEntityData(
 ;
 comment on table ch.persistEntityData is 'State of entity persist'
 ;
+
+
