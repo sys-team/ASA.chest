@@ -80,8 +80,27 @@ begin
                 execute immediate @sql;
                 
             end if;
-        end if;
+        end if; 
+    end for;
+    
+    -- Foreign keys
+    if @isTemporary = 0 then
+        for lloop2 as ccur2 cursor for
+        select distinct
+               entity as c_entity,
+               actor as c_actor,
+               name as c_name
+          from ch.entityRole
+         where entity = @entity
+            or @entity is null
+        do
         
-    end for;   
+            set @sql = 'alter table [' + @owner + '].[' + c_entity + ']'
+                     + ' add foreign key([' + c_name + ']) references [' + @owner + '].[' + c_actor + ']';
+                     
+            execute immediate @sql;
+        
+        end for;
+    end if;
 
 end;
