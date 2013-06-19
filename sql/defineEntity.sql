@@ -57,6 +57,6 @@ create or replace procedure ch.defineEntity (
             ) with ([name] text, [type] text, [expression] text) option(ROW DELIMITED BY ':') as cols
         ;
     end if;
-        
+    
 
 end;
