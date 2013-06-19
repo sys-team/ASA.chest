@@ -42,19 +42,21 @@ create or replace procedure ch.defineEntity (
         where @name = entity
     ;
     
-    insert into ch.entityCompute on existing update with auto name
-        select
-            (select id from ch.entityCompute
-                where entity = @name and [name] = cols.[name]
-            ) as id,
-            @name as entity,
-            cols.name,
-            cols.type,
-            cols.expression
-        from openstring(
-            value @computes
-        ) with ([name] text, [type] text, [expression] text) option(ROW DELIMITED BY ':') as cols
-    ;
+    if @computes is not null then
+        insert into ch.entityCompute on existing update with auto name
+            select
+                (select id from ch.entityCompute
+                    where entity = @name and [name] = cols.[name]
+                ) as id,
+                @name as entity,
+                cols.name,
+                cols.type,
+                cols.expression
+            from openstring(
+                value @computes
+            ) with ([name] text, [type] text, [expression] text) option(ROW DELIMITED BY ':') as cols
+        ;
+    end if;
         
 
 end;
