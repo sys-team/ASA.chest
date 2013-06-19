@@ -153,6 +153,22 @@ create table ch.entityRole(
 comment on table ch.entityRole is 'Entity roles'
 ;
 
+create table ch.entityCompute(
+
+    entity STRING not null,
+    name STRING not null,
+    type STRING not null,
+    expression STRING not null,
+    
+    unique(entity, name),
+       
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.entityCompute is 'Entity computed columns'
+;
+
 create table ch.dataSource(
 
     entity STRING not null,

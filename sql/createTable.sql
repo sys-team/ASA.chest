@@ -9,6 +9,7 @@ begin
     declare @sql text;
     declare @columns text;
     declare @roles text;
+    declare @computes text;
     
     for lloop as ccur cursor for
     select distinct
@@ -48,12 +49,20 @@ begin
             where er.entity = @name
         );
         
+        set @computes = (
+            select list(ec.name + ' ' + ec.type + ' compute (' + ec.expression + ')', ', ')
+            from 
+                ch.entityCompute ec
+            where ec.entity = @name
+        );
+        
         set @sql =
             'create ' + if @isTemporary = 1 then 'global temporary ' else '' endif
             + 'table ['+@owner+'].['+@name+'] ('
             + 'id ID, '
             + if @roles = '' then '' else @roles + ', ' endif
             + if @columns = '' then '' else @columns + ', ' endif
+            + if @computes = '' then '' else @computes + ', ' endif
             + 'version int, author IDREF, xid GUID, ts TS, cts CTS, primary key(id), unique(xid)'
             +') ' + if @isTemporary = 1 then 'not transactional share by all' else '' endif
         ;
