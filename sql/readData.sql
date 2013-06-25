@@ -27,20 +27,32 @@ begin
     -- entities from rel
     insert into #entity on existing update with auto name
         select distinct
-            util.strtoxid(xid) as xid,
+            coalesce(
+                util.strtoxid(xid),
+                (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
+                (select top 1 xid from #entity where name = t.name and code = t.code),
+                newid()
+            ) as xid,
             name,
             null as xmlData
         from openxml(@request, '/*/*:d/*:d') with (
                 xid long varchar '@xid',
                 name long varchar '@name',
+                code long varchar '@code',
                 xmlData xml '@mp:xmltext'
             ) as t
         where not exists( select *
             from #entity
-            where xid = util.strtoxid(t.xid)
+            where xid = coalesce(
+                            util.strtoxid(xid),
+                            (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
+                            (select top 1 xid from #entity where name = t.name and code = t.code))
         ) and not exists( select *
             from ch.entity
-            where xid =  util.strtoxid(t.xid)
+            where xid =  coalesce(
+                            util.strtoxid(xid),
+                            (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
+                            (select top 1 xid from #entity where name = t.name and code = t.code))
         )
     ;
     
@@ -68,7 +80,11 @@ begin
     -- rels
     insert into #rel on existing update with auto name
         select
-            util.strtoxid(c.xid) as childXid,
+            coalesce(
+                util.strtoxid(c.xid),
+                (select top 1 xid from ch.entity where name = c.name and code = c.code order by id desc),
+                (select top 1 xid from #entity where name = c.name and code = c.code)
+            ) as childXid,
             e.xid as parentXid,
             c.name,
             c.xmlData
@@ -76,6 +92,7 @@ begin
             from openxml(e.xmldata, '/*/*:d') with (
                 xid long varchar '@xid',
                 name long varchar '@name',
+                code long varchar '@code',
                 xmlData xml '@mp:xmltext'
             )
         ) as c
