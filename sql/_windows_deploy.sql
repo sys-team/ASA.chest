@@ -23,4 +23,5 @@ read c:\\sites\\ASA.chest\\sql\\responseRootElement.sql;
 read c:\\sites\\ASA.chest\\sql\\saveAccessToken.sql;
 read c:\\sites\\ASA.chest\\sql\\saveData.sql;
 read c:\\sites\\ASA.chest\\sql\\temporaryTables.sql;
+read c:\\sites\\ASA.chest\\sql\\triggerEvent.sql;
 read c:\\sites\\ASA.chest\\sql\\triggers.sql;

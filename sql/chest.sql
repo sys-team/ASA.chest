@@ -113,6 +113,7 @@ begin
         when 'chest' then
             call ch.readData(@request);
             call ch.saveData();
+            call ch.triggerEvent();
             set @response = ch.makeAnswer();
         when 'get' then
             set @response = ch.get(@url);
