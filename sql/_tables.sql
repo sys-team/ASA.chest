@@ -171,7 +171,7 @@ comment on table ch.entityCompute is 'Entity computed columns'
 
 create table ch.dataSource(
 
-    entity STRING not null,
+    entity STRING not null unique,
     dataSource STRING,
     type STRING,
     FKDataSource STRING,
