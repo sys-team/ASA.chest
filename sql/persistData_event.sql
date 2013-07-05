@@ -16,7 +16,7 @@ begin
     exception  
     when others then
         
-        call util.errorHandler('ch.persistData', @SQLSTATE, errormsg());
+        call util.errorHandler('ch.persistData', SQLSTATE, errormsg());
         
         rollback;
         
