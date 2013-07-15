@@ -8,6 +8,7 @@ begin
     declare @request xml;
     declare @error long varchar;
     declare @errorCode long varchar;
+    declare @sqlstate STRING;
     declare @xid GUID;
     declare @service long varchar;
     declare @charSet long varchar;
@@ -136,11 +137,15 @@ begin
         when others then
         
             set @error = errormsg();
+            set @sqlstate = SQLSTATE;
+            
             if @error like 'RAISERROR executed: %' then
                 set @errorCode =  trim(substring(@error, locate(@error,'RAISERROR executed: ') + length('RAISERROR executed: ')));
             end if;
 
             rollback;       
+            
+            call util.errorHandler('ch.chest', @sqlstate, @error);
             
             set @response = ch.responseRootElement(xmlelement('error', xmlattributes(@errorCode as "code"), @error));
             

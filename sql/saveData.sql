@@ -46,13 +46,15 @@ begin
            (select id
               from ch.entity
              where xid = #rel.childXid) as child,
-           parentXid,
-           childXid,
-           xmlData
+           #rel.parentXid,
+           #rel.childXid,
+           #rel.xmlData
       from #rel
-     where parentXid is not null
-       and childXid is not null
-       and ch.entityWriteable(name, @UOAuthRoles) = 1;
+     where #rel.parentXid is not null
+       and #rel.childXid is not null
+       and parent is not null
+       and child is not null
+       and ch.entityWriteable(#rel.name, @UOAuthRoles) = 1;
 
     -- delete rel
     delete from ch.relationship
