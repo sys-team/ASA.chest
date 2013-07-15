@@ -1,4 +1,6 @@
-create or replace procedure ch.saveData()
+create or replace procedure ch.saveData(
+    @attributes integer default 0
+)
 begin
     
     -- entity
@@ -16,19 +18,21 @@ begin
        and ch.entityWriteable(name, @UOAuthRoles) = 1;
        
     -- attribute
-    insert into ch.attribute on existing update with auto name
-    select (select a.id
-              from ch.attribute a join ch.entity e on a.parent = e.id
-             where e.xid = #attribute.parentXid
-               and a.name = #attribute.name) as id,
-           name,
-           dataType,
-           value,
-           xmlData,
-           (select id
-              from ch.entity
-             where xid = #attribute.parentXid) as parent
-      from #attribute;    
+    if @attributes = 1 then
+        insert into ch.attribute on existing update with auto name
+        select (select a.id
+                  from ch.attribute a join ch.entity e on a.parent = e.id
+                 where e.xid = #attribute.parentXid
+                   and a.name = #attribute.name) as id,
+               name,
+               dataType,
+               value,
+               xmlData,
+               (select id
+                  from ch.entity
+                 where xid = #attribute.parentXid) as parent
+          from #attribute;
+    end if;
        
     -- rel
     insert into ch.relationship on existing update with auto name
