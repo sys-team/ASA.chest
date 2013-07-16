@@ -2,7 +2,7 @@ grant connect to ch;
 grant dba to ch;
 comment on user ch is 'Chest service objects owner';
 
-create table ch.entity(
+create table if not exists ch.entity(
 
     name varchar(512) not null,
     code varchar(512) null,
@@ -22,7 +22,7 @@ comment on table ch.entity is 'Entity data'
 
 create unique index ch_entity_named_code on ch.entity (name,code);
 
-create table ch.relationship(
+create table if not exists ch.relationship(
 
     parent integer not null,
     child integer not null,    
@@ -47,7 +47,7 @@ create table ch.relationship(
 comment on table ch.relationship is 'Entity relationship'
 ;
 
-create table ch.attribute(
+create table if not exists ch.attribute(
 
     name varchar(512),
     dataType varchar(512),
@@ -65,7 +65,7 @@ comment on table ch.attribute is 'Entity attribute'
 ;
 
 
-create table ch.permission(
+create table if not exists ch.permission(
 
     role STRING,
     entity STRING,
@@ -80,7 +80,7 @@ comment on table ch.permission is 'Mapping UOAuth roles to entities'
 ;
 
 
-create table ch.entityLog(
+create table if not exists ch.entityLog(
 
     entityXid GUID,
     action integer not null,
@@ -96,7 +96,7 @@ comment on table ch.entityLog is 'Entity log'
 create index xk_entityLog_entityXid on ch.entityLog(entityXid)
 ;
 
-create table ch.relationshipLog(
+create table if not exists ch.relationshipLog(
 
     relationshipXid GUID,
     action integer not null,
@@ -112,7 +112,7 @@ comment on table ch.relationshipLog is 'Relationship log'
 create index xk_relationshipLog_relationshipXid on ch.relationshipLog(relationshipXid)
 ;
 
-create table ch.property(
+create table if not exists ch.property(
     
     name varchar(512) not null unique,
     type varchar(512) not null,
@@ -125,7 +125,7 @@ create table ch.property(
 comment on table ch.property is 'Property'
 ;
 
-create table ch.entityProperty(
+create table if not exists ch.entityProperty(
     
     entity varchar(512) not null,
     property varchar(512) not null,
@@ -140,7 +140,7 @@ create table ch.entityProperty(
 comment on table ch.entityProperty is 'Entity properties'
 ;
 
-create table ch.entityRole(
+create table if not exists ch.entityRole(
 
     entity STRING not null,
     actor STRING not null,
@@ -153,7 +153,7 @@ create table ch.entityRole(
 comment on table ch.entityRole is 'Entity roles'
 ;
 
-create table ch.entityCompute(
+create table if not exists ch.entityCompute(
 
     entity STRING not null,
     name STRING not null,
@@ -169,7 +169,7 @@ create table ch.entityCompute(
 comment on table ch.entityCompute is 'Entity computed columns'
 ;
 
-create table ch.dataSource(
+create table if not exists ch.dataSource(
 
     entity STRING not null unique,
     dataSource STRING,
@@ -185,7 +185,7 @@ create table ch.dataSource(
 comment on table ch.dataSource is 'Entity data source'
 ;
 
-create table ch.persistEntityData(
+create table if not exists ch.persistEntityData(
 
     entity STRING not null unique,
     persistTs datetime,
