@@ -35,7 +35,7 @@ begin
         end if;
            
         set @columns = (
-            select list(ch.remoteColumnName(p.name) + ' '+p.type, ', ')
+            select list('['+ch.remoteColumnName(p.name) + '] '+p.type, ', ')
             from 
                 ch.entityProperty ep
                 join ch.property p
@@ -43,7 +43,7 @@ begin
         );
         
         set @roles = (
-            select list(er.name+' IDREF', ', ')
+            select list('['+er.name+'] IDREF', ', ')
             from 
                 ch.entityRole er
             where er.entity = @name
@@ -67,7 +67,7 @@ begin
             +') ' + if @isTemporary = 1 then 'not transactional share by all' else '' endif
         ;
         
-        --message 'ch.createTable @sql = ', @sql;
+        message 'ch.createTable @sql = ', @sql to client;
         execute immediate @sql;
         
         if @isTemporary = 0 then
