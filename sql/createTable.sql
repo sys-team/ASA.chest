@@ -17,6 +17,7 @@ begin
         from ch.entityProperty
         where entity = @entity
             or @entity is null
+    union select @entity
     do
     
         if exists(select *
