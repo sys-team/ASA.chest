@@ -15,7 +15,9 @@ begin
             union select nullif(
                 (select list('(select c.id '+
                         'from ch.relationship r join ch.entity c on r.child = c.id ' +
-                        ' where r.parent = e.id and c.name = ''' + r.actor +''') as [' + r.name + '] ')
+                        ' where r.parent = e.id and c.name = ''' +
+                        r.actor +
+                        ''' and isnull(r.role,c.name) = ''' + r.name + ''') as [' + r.name + '] ')
                     from ch.entityRole r
                     where entity = @entity
                 ),

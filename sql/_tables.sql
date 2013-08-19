@@ -25,7 +25,10 @@ create unique index ch_entity_named_code on ch.entity (name,code);
 create table if not exists ch.relationship(
 
     parent integer not null,
-    child integer not null,    
+    child integer not null,
+    
+    role varchar(512),
+    
     parentXid GUID not null,
     childXid GUID not null,
     

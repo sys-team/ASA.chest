@@ -39,30 +39,34 @@ begin
     select (select id
               from ch.relationship
              where parentXid = #rel.parentXid
-               and childXid = #rel.childXid) as id,
+               and childXid = #rel.childXid) as [id],
            (select id
               from ch.entity
-             where xid = #rel.parentXid) as parent,
+             where xid = #rel.parentXid) as [parent],
            (select id
               from ch.entity
-             where xid = #rel.childXid) as child,
+             where xid = #rel.childXid) as [child],
            #rel.parentXid,
            #rel.childXid,
-           #rel.xmlData
+           #rel.xmlData,
+           #rel.name as [role]
       from #rel
      where #rel.parentXid is not null
        and #rel.childXid is not null
        and parent is not null
        and child is not null
-       and ch.entityWriteable(#rel.name, @UOAuthRoles) = 1;
+       and ch.entityWriteable(#rel.name, @UOAuthRoles) = 1
+    ;
 
     -- delete rel
     delete from ch.relationship
     where parentXid in (select xid from #entity)
-      and not exists (select *
-                        from #rel
-                       where parentXid = ch.relationship.parentXid
-                         and childXid = ch.relationship.childXid);
+      and not exists (
+        select *
+        from #rel
+        where parentXid = ch.relationship.parentXid
+            and childXid = ch.relationship.childXid
+    );
 
 end
 ;

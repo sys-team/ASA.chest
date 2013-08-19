@@ -20,15 +20,16 @@ begin
         xmlData xml,
         primary key(xid)
     );
-                                          
+    
     declare local temporary table #rel(
         name varchar(512),
+        role varchar(512),
         childXid GUID,
         parentXid GUID,
         xmlData xml,
         primary key(childXid, parentXid)
     );
-                                       
+    
     declare local temporary table #attribute(
         name varchar(512),
         dataType varchar(512),
@@ -79,14 +80,16 @@ begin
     set @UOAuthRoles = uac.UOAuthAuthorize(@code); 
     -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
     
-    set @UOAuthAccount = (select id
-                            from openxml(@UOAuthRoles,'/*:response/*:account')
-                            with (id integer '*:id'));
-                            
+    set @UOAuthAccount = (
+        select id
+        from openxml(@UOAuthRoles,'/*:response/*:account')
+            with (id integer '*:id')
+    );
+
     update ch.log
        set account = @UOAuthAccount
     where xid = @xid;
-                   
+    
     if @UOAuthAccount is null then
         set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
         update ch.log
@@ -126,10 +129,10 @@ begin
     
     set @response = ch.responseRootElement(@response);
     
-    update ch.log
-       set response = @response,
-           service = @service
-     where xid = @xid;
+    update ch.log set
+        response = @response,
+        service = @service
+    where xid = @xid;
     
     return @response;
     
