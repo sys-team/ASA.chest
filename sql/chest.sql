@@ -91,12 +91,17 @@ begin
     where xid = @xid;
     
     if @UOAuthAccount is null then
+        
         set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
+        
         update ch.log
-           set response = @response
-         where xid = @xid;
-            
+            set response = @response
+        where xid = @xid;
+        
+        CALL dbo.sa_set_http_header( '@HttpStatus', '401' );
+        
         return @response;
+        
     end if;
     
     -- parse url
@@ -117,7 +122,7 @@ begin
         when 'chest' then
             call ch.readData(@request);
             call ch.saveData();
-            call ch.triggerEvent();
+            call ch.triggerEvent(@code);
             set @response = ch.makeAnswer();
         when 'get' then
             set @response = ch.get(@url);
@@ -156,6 +161,8 @@ begin
                set response = @response,
                    service = @service
             where xid = @xid;
+            
+            CALL dbo.sa_set_http_header( '@HttpStatus', '500' );
             
             return @response;
             
