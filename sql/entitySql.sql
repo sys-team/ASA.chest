@@ -1,6 +1,7 @@
 create or replace function ch.entitySql (
     @entity long varchar,
-    @dateConversion integer default 0
+    @dateConversion integer default 0,
+    @entitySrc string default @entity
 )
 returns long varchar
 begin
@@ -15,8 +16,8 @@ begin
             union select nullif(
                 (select list('(select c.id '+
                         'from ch.relationship r join ch.entity c on r.child = c.id ' +
-                        ' where r.parent = e.id and c.name = ''' +
-                        r.actor +
+                        ' where r.parent = e.id and c.xmldata is not null and c.name = ''' +
+                        r.actor + 
                         ''' and isnull(r.role,c.name) = ''' + r.name + ''') as [' + r.name + '] ')
                     from ch.entityRole r
                     where entity = @entity
@@ -72,7 +73,8 @@ begin
             + ')) as x ' 
         else '' endif
         
-        +' where e.name = ''' + @entity +''''
+        + ' where e.name = ''' + @entitySrc +''''
+        + ' and e.xmldata is not null'
     ;
     
     return @sql;
