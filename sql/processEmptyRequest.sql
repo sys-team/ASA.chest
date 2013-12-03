@@ -1,4 +1,4 @@
-create or replace function ch.processEmptyRequest(
+CREATE OR REPLACE FUNCTION "ch"."processEmptyRequest"(
     @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('authorization:'))
 )
 returns xml
@@ -43,7 +43,7 @@ begin
                         , 'distanceFilter', 'requiredAccuracy', 'timeFilter'
                         , 'syncInterval', 'fetchLimit', 'syncServerURI'
                         , 'trackerAutoStart', 'trackerStartTime'
-                        , 'trackerFinishTime', 'checkingBattery','localAccessToSettings'
+                        , 'trackerFinishTime', 'checkingBattery','localAccessToSettings','transterLogs'
                     )
                     
                 ) as xmlData
@@ -107,6 +107,11 @@ begin
                 'double'
                 , xmlattributes ('localAccessToSettings' as "name")
                 , 0
+            )
+            , xmlelement(
+                'double'
+                , xmlattributes ('transterLogs' as "name")
+                , 1
             )
     ));
     
