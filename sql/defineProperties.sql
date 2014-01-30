@@ -6,7 +6,9 @@ create or replace procedure ch.defineProperties (
         select (select id from ch.property where name = cols.name) as id, *
         from openstring(
             value @data
-        ) with ([name] text, [type] text) option(ROW DELIMITED BY ':') as cols
+        ) with (
+            [name] text, [type] text, [initial] text
+        ) option(ROW DELIMITED BY ':') as cols
     ;
 
 end;
