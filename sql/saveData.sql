@@ -10,12 +10,17 @@ begin
              where xid = #entity.xid) as id,
            name,
            code,
-           xmlData,
+           if type = 'd' then
+                #entity.xmlData
+           else
+                ch.mergeXml(#entity.xmlData, (select xmlData from ch.entity where xid = #entity.xid))
+           endif as xmlData,
            xid
       from #entity
      where xid is not null
        and name is not null
        and ch.entityWriteable(name, @UOAuthRoles) = 1;
+       
        
     -- attribute
     if @attributes = 1 then

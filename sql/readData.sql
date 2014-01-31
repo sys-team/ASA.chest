@@ -13,8 +13,26 @@ begin
             ) as xid,
             name,
             code,
-            xmlData
+            xmlData,
+            'd' as type
         from openxml(@request, '/*/*:d') with (
+            xid long varchar '@xid',
+            name long varchar '@name',
+            code long varchar '@code',
+            xmlData xml '@mp:xmltext'
+        ) e
+        union
+        select
+            coalesce(
+                util.strtoxid(xid),
+                (select top 1 xid from ch.entity where name=e.name and code=e.code order by id desc),
+                newid()
+            ) as xid,
+            name,
+            code,
+            xmlData,
+            'm' as type
+        from openxml(@request, '/*/*:m') with (
             xid long varchar '@xid',
             name long varchar '@name',
             code long varchar '@code',
@@ -35,7 +53,7 @@ begin
             ) as xid,
             name,
             null as xmlData
-        from openxml(@request, '/*/*:d/*:d') with (
+        from openxml(@request, '/*/*/*:d') with (
                 xid long varchar '@xid',
                 name long varchar '@name',
                 code long varchar '@code',

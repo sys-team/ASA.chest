@@ -5,7 +5,7 @@ begin
     
     set @result = (
         select xmlagg(
-            xmlelement('d',
+            xmlelement(type,
                 xmlattributes(name as "name", upper(uuidtostr(xid)) as "xid", code),
                 if ch.entityWriteable(name, @UOAuthRoles) = 1 then
                     if name is not null and xid is not null then 'ok' else 'error' endif

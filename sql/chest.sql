@@ -17,6 +17,7 @@ begin
         name varchar(512),
         xid GUID,
         code varchar(512),
+        type varchar(24) default 'd',
         xmlData xml,
         primary key(xid)
     );
