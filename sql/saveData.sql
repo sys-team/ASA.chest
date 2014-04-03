@@ -19,9 +19,10 @@ begin
       from #entity
      where xid is not null
        and name is not null
-       and ch.entityWriteable(name, @UOAuthRoles) = 1;
-       
-       
+       and ch.entityWriteable(name, @UOAuthRoles) = 1
+    ;
+    
+    
     -- attribute
     if @attributes = 1 then
         insert into ch.attribute on existing update with auto name
@@ -38,7 +39,7 @@ begin
                  where xid = #attribute.parentXid) as parent
           from #attribute;
     end if;
-       
+    
     -- rel
     insert into ch.relationship on existing update with auto name
     select (select id

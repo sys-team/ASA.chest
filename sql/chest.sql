@@ -41,7 +41,7 @@ begin
         primary key(parentXid, name)
     );
     
-    if varexists('@UOAuthAccount') = 0 then                                   
+    if varexists('@UOAuthAccount') = 0 then
         create variable @UOAuthAccount integer;
     end if;
     
