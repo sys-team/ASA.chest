@@ -14,30 +14,15 @@ begin
             name,
             code,
             xmlData,
-            'd' as type
-        from openxml(@request, '/*/*:d') with (
+            type
+        from openxml(@request, '/*/*') with (
             xid long varchar '@xid',
             name long varchar '@name',
             code long varchar '@code',
-            xmlData xml '@mp:xmltext'
+            xmlData xml '@mp:xmltext',
+            type varchar(32) '@mp:localname'
         ) e
-        union
-        select
-            coalesce(
-                util.strtoxid(xid),
-                (select top 1 xid from ch.entity where name=e.name and code=e.code order by id desc),
-                newid()
-            ) as xid,
-            name,
-            code,
-            xmlData,
-            'm' as type
-        from openxml(@request, '/*/*:m') with (
-            xid long varchar '@xid',
-            name long varchar '@name',
-            code long varchar '@code',
-            xmlData xml '@mp:xmltext'
-        ) e
+        where type in ('d','m')
     ;
     
     --message 'ch.readData #1';
@@ -118,5 +103,4 @@ begin
     
     --message 'ch.readData #3';
     
-end
-;
+end;
