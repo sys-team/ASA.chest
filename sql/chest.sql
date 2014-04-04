@@ -17,6 +17,7 @@ begin
         name varchar(512),
         xid GUID,
         code varchar(512),
+        type varchar(24) default 'd',
         xmlData xml,
         primary key(xid)
     );
@@ -40,7 +41,7 @@ begin
         primary key(parentXid, name)
     );
     
-    if varexists('@UOAuthAccount') = 0 then                                   
+    if varexists('@UOAuthAccount') = 0 then
         create variable @UOAuthAccount integer;
     end if;
     

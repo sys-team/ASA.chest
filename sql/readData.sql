@@ -13,13 +13,16 @@ begin
             ) as xid,
             name,
             code,
-            xmlData
-        from openxml(@request, '/*/*:d') with (
+            xmlData,
+            type
+        from openxml(@request, '/*/*') with (
             xid long varchar '@xid',
             name long varchar '@name',
             code long varchar '@code',
-            xmlData xml '@mp:xmltext'
+            xmlData xml '@mp:xmltext',
+            type varchar(32) '@mp:localname'
         ) e
+        where type in ('d','m')
     ;
     
     --message 'ch.readData #1';
@@ -35,7 +38,7 @@ begin
             ) as xid,
             name,
             null as xmlData
-        from openxml(@request, '/*/*:d/*:d') with (
+        from openxml(@request, '/*/*/*:d') with (
                 xid long varchar '@xid',
                 name long varchar '@name',
                 code long varchar '@code',
@@ -100,5 +103,4 @@ begin
     
     --message 'ch.readData #3';
     
-end
-;
+end;
