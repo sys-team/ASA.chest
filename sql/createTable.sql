@@ -75,7 +75,7 @@ begin
             set @sql = 'create index [xk_' + @owner + '_' + @name + '_ts]' +
                         ' on [' + @owner + '].[' + @name + '](ts)';
                         
-            --message 'ch.createTable @sql = ', @sql;
+            message 'ch.createTable @sql = ', @sql to client;
             execute immediate @sql;
                         
             if exists (select *
@@ -86,7 +86,7 @@ begin
                 set @sql = 'create index [xk_' + @owner + '_' + @name + '_remoteTs]' +
                             ' on [' + @owner + '].[' + @name + '](remoteTs)';
                             
-                --message 'ch.createTable @sql = ', @sql;
+                message 'ch.createTable @sql = ', @sql to client;
                 execute immediate @sql;
                 
             end if;
