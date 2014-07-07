@@ -82,9 +82,9 @@ begin
     -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
     
     set @UOAuthAccount = (
-        select id
-        from openxml(@UOAuthRoles,'/*:response/*:account')
-            with (id integer '*:id')
+        select account
+        from uac.token
+        where token = @code
     );
 
     update ch.log
