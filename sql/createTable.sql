@@ -97,17 +97,23 @@ begin
     if @isTemporary = 0 then
         for lloop2 as ccur2 cursor for
         select distinct
-               entity as c_entity,
-               actor as c_actor,
-               name as c_name
-          from ch.entityRole
-         where entity = @entity
+                entity as c_entity,
+                actor as c_actor,
+                name as c_name
+            from ch.entityRole er
+        where (entity = @entity
             or @entity is null
+        ) and exists (
+            select * from systable
+            where creator=user_id(@owner) and table_name = c_actor
+                and table_type = 'base'
+        )
         do
         
             set @sql = 'alter table [' + @owner + '].[' + c_entity + ']'
-                     + ' add foreign key([' + c_name + ']) references [' + @owner + '].[' + c_actor + ']';
-                     
+                + ' add foreign key([' + c_name + ']) references [' + @owner + '].[' + c_actor + ']'
+            ;
+            message 'ch.createTable @sql = ', @sql to client;
             execute immediate @sql;
         
         end for;
