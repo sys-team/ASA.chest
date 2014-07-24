@@ -66,7 +66,7 @@ begin
 
     -- delete rel
     delete from ch.relationship
-    where parentXid in (select xid from #entity)
+    where parentXid in (select xid from #entity where type = 'd')
       and not exists (
         select *
         from #rel
