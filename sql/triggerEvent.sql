@@ -3,7 +3,7 @@ create or replace procedure ch.triggerEvent(
 ) begin
     declare @sql long varchar;
 
-    for lloop as global_events cursor for 
+    for lloop as global_events cursor for
     select event_name as c_name
         from sys.sysevent
         where event_name like '%chestDataPersist'
@@ -12,12 +12,12 @@ create or replace procedure ch.triggerEvent(
         set @sql  ='trigger event ' + c_name;
         execute immediate @sql;
     end for;
-    
+
     begin
-        
+
         DECLARE no_entity EXCEPTION FOR SQLSTATE '42W33';
-        
-        for lloop as entity_events cursor for 
+
+        for lloop as entity_events cursor for
         select
                 ev.event_name as event_name,
                 en.name as entity_name,
@@ -37,10 +37,10 @@ create or replace procedure ch.triggerEvent(
             message 'ch.triggerEvent:', @sql to client;
             execute immediate @sql;
         end for;
-        
+
     exception when no_entity then
         message 'ch.triggerEvent:', 'No #entity ' to client ;
-        
+
     end;
 
 end;
