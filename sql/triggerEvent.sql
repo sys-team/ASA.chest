@@ -28,7 +28,7 @@ create or replace procedure ch.triggerEvent(
             group by event_name, entity_name
         do
             set @sql = string (
-                'trigger event ', event_name,
+                'trigger event [', event_name, ']',
                 ' ( ',
                     '"entity_xids" = ''', entity_xids, '''',
                     ',"auth_token" = ''', isnull (@code, 'null'), '''',
