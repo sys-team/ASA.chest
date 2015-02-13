@@ -201,3 +201,16 @@ comment on table ch.persistEntityData is 'State of entity persist'
 ;
 
 
+create table if not exists ch.entityStorage(
+
+    nameRe varchar(512) not null unique,
+    ord integer default 0,
+    storage varchar(512) null,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+
+)
+;
+comment on table ch.entity is 'Entity data storage'
+;
