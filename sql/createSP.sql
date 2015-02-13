@@ -1,7 +1,8 @@
 create or replace procedure ch.createSP(
     @entity string default null,
     @entitySrc string default null,
-    @owner string default 'ch'
+    @owner string default 'ch',
+    @name string default null
 )
 begin
     declare @sql long varchar;
@@ -15,7 +16,7 @@ begin
     union select @entity
     do
         set @sql = 'create or replace procedure [' + @owner + '].'
-            + '[' + c_name + ']'
+            + '[' + isnull(@name,c_name) + ']'
             + '() begin '
             + ch.entitySql(c_name, 0, isnull(@entitySrc, c_name))
             + ' end '
