@@ -14,7 +14,13 @@ begin
                 endif
             )
         )
-        from #entity
+        from (
+            select
+                xid, name, code
+            from #entity
+            union all select
+                xid, name, null from #entityIgnored
+            ) as e
     );
     
     return @result;

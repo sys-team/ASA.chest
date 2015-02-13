@@ -21,7 +21,14 @@ begin
         xmlData xml,
         primary key(xid)
     );
-    
+
+    declare local temporary table #entityIgnored(
+        name varchar(512),
+        xid GUID,
+        xmlData xml,
+        primary key(xid)
+    );
+
     declare local temporary table #rel(
         name varchar(512),
         role varchar(512),

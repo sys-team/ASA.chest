@@ -26,7 +26,27 @@ begin
     ;
     
     --message 'ch.readData #1';
-    
+
+    insert into #entityIgnored with auto name
+    select xid, name, xmlData
+    from #entity where exists (
+        select *
+        from ch.entity
+        where entity.xid = #entity.xid
+            and entity.name <> #entity.name
+    );
+
+    if @@rowcount > 0 then
+
+        delete #entity
+        from #entityIgnored
+        where #entityIgnored.xid = #entity.xid
+        ;
+
+        message 'ch.readData deleted: ', @@rowcount;
+
+    end if;
+
     -- entities from rel
     insert into #entity on existing update with auto name
         select distinct
@@ -47,20 +67,22 @@ begin
         where not exists( select *
             from #entity
             where xid = coalesce(
-                            util.strtoxid(xid),
-                            (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
-                            (select top 1 xid from #entity where name = t.name and code = t.code))
+                util.strtoxid(xid),
+                (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
+                (select top 1 xid from #entity where name = t.name and code = t.code)
+            )
         ) and not exists( select *
             from ch.entity
             where xid =  coalesce(
-                            util.strtoxid(xid),
-                            (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
-                            (select top 1 xid from #entity where name = t.name and code = t.code))
+                util.strtoxid(xid),
+                (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
+                (select top 1 xid from #entity where name = t.name and code = t.code)
+            )
         )
     ;
-    
+
     --message 'ch.readData #2';
-    
+
     -- attributes
     insert into #attribute on existing update with auto name
         select
@@ -72,8 +94,8 @@ begin
             e.name parentName
         from #entity as e cross apply ( select *
             from openxml(e.xmldata, '/*/*') with (
-                name long varchar '@name', 
-                dataType long varchar '@mp:localname', 
+                name long varchar '@name',
+                dataType long varchar '@mp:localname',
                 value long varchar '.',
                 xmlData xml '@mp:xmltext'
             ) where dataType <> 'd'
