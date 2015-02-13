@@ -6,7 +6,7 @@ create or replace procedure ch.createSP(
 )
 begin
     declare @sql long varchar;
-    
+
     for lloop as ccur cursor for
     select distinct
            entity as c_name
@@ -21,11 +21,11 @@ begin
             + ch.entitySql(c_name, 0, isnull(@entitySrc, c_name))
             + ' end '
         ;
-        
+
         message @sql to client;
-        
+
         execute immediate @sql;
-        
+
     end for;
 
 end;

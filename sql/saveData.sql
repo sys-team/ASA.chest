@@ -2,7 +2,7 @@ create or replace procedure ch.saveData(
     @attributes integer default 0
 )
 begin
-    
+
     -- entity
     merge into ch.entity (name, code, xmlData, xid) using with auto name (
             select
@@ -25,8 +25,8 @@ begin
                 ch.mergeXml(e.xmlData, entity.xmlData)
             endif
     ;
-    
-    
+
+
     -- attribute
     if @attributes = 1 then
         insert into ch.attribute on existing update with auto name
@@ -43,7 +43,7 @@ begin
                  where xid = #attribute.parentXid) as parent
           from #attribute;
     end if;
-    
+
     -- rel
     insert into ch.relationship on existing update with auto name
     select (select id

@@ -2,7 +2,7 @@ create or replace function ch.makeAnswer()
 returns xml
 begin
     declare @result xml;
-    
+
     set @result = (
         select xmlagg(
             xmlelement('d',
@@ -22,8 +22,7 @@ begin
                 xid, name, null from #entityIgnored
             ) as e
     );
-    
+
     return @result;
 
-end
-;
+end;

@@ -2,7 +2,7 @@ create or replace procedure ch.readData(
     @request xml
 )
 begin
-    
+
     -- entities
     insert into #entity on existing update with auto name
         select
@@ -24,7 +24,7 @@ begin
         ) e
         where type in ('d','m')
     ;
-    
+
     --message 'ch.readData #1';
 
     insert into #entityIgnored with auto name
@@ -99,9 +99,9 @@ begin
                 value long varchar '.',
                 xmlData xml '@mp:xmltext'
             ) where dataType <> 'd'
-        ) as c 
+        ) as c
     ;
-    
+
     -- rels
     insert into #rel on existing update with auto name
         select
@@ -122,7 +122,7 @@ begin
             )
         ) as c
     ;
-    
+
     --message 'ch.readData #3';
-    
+
 end;

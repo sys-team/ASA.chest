@@ -10,7 +10,7 @@ create table if not exists ch.entity(
 
     version integer default 1,
     not null foreign key(author) references uac.account,
-    
+
 
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
@@ -26,23 +26,23 @@ create table if not exists ch.relationship(
 
     parent integer not null,
     child integer not null,
-    
+
     role varchar(512),
-    
+
     parentXid GUID not null,
     childXid GUID not null,
-    
+
     xmlData xml,
-    
+
     version integer default 1,
     not null foreign key(author) references uac.account,
-    
+
     not null foreign key(parent) references ch.entity on delete cascade,
     not null foreign key(child) references ch.entity on delete cascade,
-    
+
     unique(parent, child),
     unique(parentXid, childXid),
-    
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
@@ -55,7 +55,7 @@ create table if not exists ch.attribute(
     name varchar(512),
     dataType varchar(512),
     value long varchar,
-    
+
     xmlData xml,
 
     not null foreign key(parent) references ch.entity on delete cascade,
@@ -74,9 +74,9 @@ create table if not exists ch.permission(
     entity STRING,
     writeable BOOL,
     readable BOOL,
-    
+
     id ID, xid GUID, ts TS, cts CTS,
-    unique (xid), primary key (id) 
+    unique (xid), primary key (id)
 )
 ;
 comment on table ch.permission is 'Mapping UOAuth roles to entities'
@@ -116,11 +116,11 @@ create index xk_relationshipLog_relationshipXid on ch.relationshipLog(relationsh
 ;
 
 create table if not exists ch.property(
-    
+
     name varchar(512) not null unique,
     type varchar(512) not null,
     initial long varchar,
-    
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
@@ -129,11 +129,11 @@ comment on table ch.property is 'Property'
 ;
 
 create table if not exists ch.entityProperty(
-    
+
     entity varchar(512) not null,
     property varchar(512) not null,
     initial long varchar,
-    
+
     foreign key(property) references ch.property(name),
 
     id ID, xid GUID, ts TS, cts CTS,
@@ -148,7 +148,7 @@ create table if not exists ch.entityRole(
     entity STRING not null,
     actor STRING not null,
     name STRING not null,
-    
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
@@ -162,9 +162,9 @@ create table if not exists ch.entityCompute(
     name STRING not null,
     type STRING not null,
     expression STRING not null,
-    
+
     unique(entity, name),
-       
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )
@@ -179,7 +179,7 @@ create table if not exists ch.dataSource(
     type STRING,
     FKDataSource STRING,
     FKType STRING,
-    
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 
@@ -192,7 +192,7 @@ create table if not exists ch.persistEntityData(
 
     entity STRING not null unique,
     persistTs datetime,
-    
+
     id ID, xid GUID, ts TS, cts CTS,
     unique (xid), primary key (id)
 )

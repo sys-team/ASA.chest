@@ -7,11 +7,11 @@ returns long varchar
 begin
     declare @sql long varchar;
     declare @cnt integer;
-    
+
     set @sql = (
         select list(f)
         from (
-            select    
+            select
                 'select e.id ' as f
             union select nullif(
                 (select list('(select c.id '+
@@ -25,26 +25,26 @@ begin
             )
         ) as t
     );
-    
+
     set @cnt = (
         select count(*)
         from ch.entityProperty
         where entity = @entity
     );
-    
+
     set @sql = @sql
-        
+
         +if @cnt <> 0
             then ',' +
               (select list('x.[' + ch.remoteColumnName(property) + ']')
                 from ch.entityProperty where entity = @entity)
             else ''
         endif
-        
+
         +', e.version, e.author, e.xid, e.ts, e.cts'
         + ' from ch.entity e '
-        
-        + if @cnt <> 0 then 
+
+        + if @cnt <> 0 then
             ' outer apply (select '
             + (select list(
                     + if p.initial is not null
@@ -69,13 +69,13 @@ begin
                 ) from ch.entityProperty ep join ch.property p
                 where entity = @entity
             )
-            + ')) as x ' 
+            + ')) as x '
         else '' endif
-        
+
         + ' where e.name = ''' + @entitySrc +''''
         + ' and e.xmldata is not null'
     ;
-    
+
     return @sql;
-    
+
 end;
