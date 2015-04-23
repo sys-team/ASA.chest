@@ -10,6 +10,7 @@ read c:\\sites\\ASA.chest\\sql\\entityData.sql;
 read c:\\sites\\ASA.chest\\sql\\entityMaxTS.sql;
 read c:\\sites\\ASA.chest\\sql\\entitySql.sql;
 read c:\\sites\\ASA.chest\\sql\\entityStats.sql;
+read c:\\sites\\ASA.chest\\sql\\entityStorage.sql;
 read c:\\sites\\ASA.chest\\sql\\entityWriteable.sql;
 read c:\\sites\\ASA.chest\\sql\\fillEntityProperty.sql;
 read c:\\sites\\ASA.chest\\sql\\fillEntityRole.sql;

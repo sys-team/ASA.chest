@@ -10,6 +10,7 @@ read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityData.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityMaxTS.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entitySql.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityStats.sql;
+read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityStorage.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityWriteable.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/fillEntityProperty.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/fillEntityRole.sql;
@@ -28,5 +29,3 @@ read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/saveData.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/temporaryTables.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/triggerEvent.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/triggers.sql;
-
-
