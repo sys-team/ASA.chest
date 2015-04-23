@@ -14,14 +14,28 @@ begin
             select
                 'select e.id ' as f
             union select nullif(
-                (select list('(select c.id '+
-                        'from ch.relationship r join ch.entity c on r.child = c.id ' +
-                        ' where r.parent = e.id and c.xmldata is not null' +
-                        ' and isnull(r.role,c.name) = ''' + r.name + ''') as [' + r.name + '] ')
+                (select list(string(colDef, ' as [', colName,']')) from (
+                    select
+                        regexp_substr(actor,'.*(?=\.)') as actor_owner,
+                        regexp_substr(actor,'[^\.]*$') as actor_name,
+                        r.name as colName,
+                        if actor_owner is null then
+                            '(select c.id '+
+                            'from ch.relationship r join ch.entity c on r.child = c.id ' +
+                            ' where r.parent = e.id and c.xmldata is not null' +
+                            ' and isnull(r.role,c.name) = ''' + r.name + ''')'
+                        else string(
+                            '(select id from [',
+                            actor_owner, '].[', actor_name, '] ',
+                            'where xid = ',
+                            '(select xid from openxml (e.xmldata,''/*:d/*:d[@name="',r.name,'"]'')',
+                            ' with (xid uniqueidentifier ''@xid'') as d',
+                            ')',
+                            ')'
+                        ) endif as colDef
                     from ch.entityRole r
                     where entity = @entity
-                ),
-                ''
+                ) as t),''
             )
         ) as t
     );
