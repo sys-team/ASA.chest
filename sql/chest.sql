@@ -60,6 +60,11 @@ begin
 
     set @xid = newid();
     set @request = http_body();
+    set @charSet = util.xmlCharset(@request);
+    
+    if @charSet is not null then
+        set @request = csconvert(@request,'db_charset', @charSet);
+    end if;
 
     insert into ch.log with auto name
     select @xid as xid,
@@ -67,19 +72,6 @@ begin
            @code as code,
            if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
            if util.isXML(@request) = 0 then @request else null endif as httpBody;
-
-
-    if util.isXML(@request) = 1 then
-        update ch.log
-           set httpBodyXML = @request
-         where xid = @xid;
-    end if;
-
-
-    set @charSet = util.xmlCharset(@request);
-    if @charSet is not null then
-        set @request = csconvert(@request,'db_charset', @charSet);
-    end if;
 
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
         set @service = 'settings';

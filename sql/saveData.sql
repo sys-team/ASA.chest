@@ -4,26 +4,22 @@ create or replace procedure ch.saveData(
 begin
 
     -- entity
-    merge into ch.entity (name, code, xmlData, xid) using with auto name (
-            select
-                name,
-                code,
-                xmlData,
-                xid,
-                type
-            from #entity
-            where xid is not null
-                and name is not null
-                and ch.entityWriteable(name, @UOAuthRoles) = 1
-        ) as e on e.xid = entity.xid
-    when not matched then insert
-    when matched and entity.name = e.name then update set
-        xmlData =
-            if e.type = 'd' then
-                e.xmlData
-            else
-                ch.mergeXml(e.xmlData, entity.xmlData)
-            endif
+    insert into ch.entity on existing update with auto name
+    select (select id
+              from ch.entity
+             where xid = #entity.xid) as id,
+           name,
+           code,
+           if type = 'd' then
+                #entity.xmlData
+           else
+                ch.mergeXml(#entity.xmlData, (select xmlData from ch.entity where xid = #entity.xid))
+           endif as xmlData,
+           xid
+      from #entity
+     where xid is not null
+       and name is not null
+       and ch.entityWriteable(name, @UOAuthRoles) = 1
     ;
 
 
