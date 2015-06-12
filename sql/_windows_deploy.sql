@@ -20,6 +20,7 @@ read c:\\sites\\ASA.chest\\sql\\mergeXml.sql;
 read c:\\sites\\ASA.chest\\sql\\parseVariables.sql;
 read c:\\sites\\ASA.chest\\sql\\persistData.sql;
 read c:\\sites\\ASA.chest\\sql\\persistData_event.sql;
+read c:\\sites\\ASA.chest\\sql\\setPersistData.sql;
 read c:\\sites\\ASA.chest\\sql\\processEmptyRequest.sql;
 read c:\\sites\\ASA.chest\\sql\\readData.sql;
 read c:\\sites\\ASA.chest\\sql\\remoteColumnName.sql;

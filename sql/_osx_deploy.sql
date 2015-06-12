@@ -20,6 +20,7 @@ read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/mergeXml.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/parseVariables.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/persistData.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/persistData_event.sql;
+read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/setPersistData.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/processEmptyRequest.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/readData.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/remoteColumnName.sql;
