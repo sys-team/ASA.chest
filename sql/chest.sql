@@ -61,17 +61,22 @@ begin
     set @xid = newid();
     set @request = http_body();
     set @charSet = util.xmlCharset(@request);
-    
+
     if @charSet is not null then
         set @request = csconvert(@request,'db_charset', @charSet);
     end if;
 
-    insert into ch.log with auto name
-    select @xid as xid,
-           @url as url,
-           @code as code,
-           if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
-           if util.isXML(@request) = 0 then @request else null endif as httpBody;
+    insert into ch.log with auto name select
+        @xid as xid,
+        @url as url,
+        @code as code,
+        if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
+        if util.isXML(@request) = 0 then @request else null endif as httpBody,
+        isnull(
+            util.HTTPVariableOrHeader('x-real-ip'),
+            connection_property('ClientNodeAddress')
+        ) as callerIP
+    ;
 
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
         set @service = 'settings';
