@@ -76,11 +76,13 @@ begin
                 where entity = @entity
             )
             + ' from openxml(e.xmlData, ''/*:d'') with( '
-            + (select list(
-                    '[' + ch.remoteColumnName(ep.property)
-                    + '] ' + if p.type like 'date%' then 'string' else p.type endif
-                    + ' ''*[@name="' + ep.property + '"]'''
-                ) from ch.entityProperty ep join ch.property p
+            + (select list(string(
+                    '[', ch.remoteColumnName(ep.property),
+                    '] ', if p.type like 'date%' then 'string' else p.type endif,
+                    ' ''*[@name="', ep.property, '"]',
+                    if p.type = 'xml' then '/@mp:xmltext' endif,
+                    ''''
+                )) from ch.entityProperty ep join ch.property p
                 where entity = @entity
             )
             + ')) as x '
