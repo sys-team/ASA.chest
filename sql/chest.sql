@@ -1,6 +1,6 @@
 create or replace function ch.chest(
     @url long varchar,
-    @code long varchar default isnull(nullif(replace(http_header('Authorization'), 'Bearer ', ''),''), http_variable('authorization:'))
+    @code long varchar default util.HTTPVariableOrHeader ()
 )
 returns xml
 begin
@@ -125,7 +125,7 @@ begin
 
     case @service
         when 'chest' then
-            call ch.readData(@request);
+            call ch.readData(@request,@code);
             call ch.saveData();
             call ch.triggerEvent(@code);
             set @response = ch.makeAnswer();
