@@ -81,25 +81,6 @@ begin
         )
     ;
 
-    --message 'ch.readData #2';
-
-    -- attributes
-    insert into #attribute on existing update with auto name
-        select
-            c.name,
-            c.dataType,
-            c.value,
-            c.xmlData,
-            e.xid parentXid,
-            e.name parentName
-        from #entity as e cross apply ( select *
-            from openxml(e.xmldata, '/*/*') with (
-                name long varchar '@name',
-                dataType long varchar '@mp:localname',
-                value long varchar '.',
-                xmlData xml '@mp:xmltext'
-            ) where dataType <> 'd'
-        ) as c
     ;
 
     -- rels
