@@ -1,8 +1,13 @@
 create or replace procedure ch.saveData(
-    @attributes integer default 0
+    @attributes integer default 0,
+    @code long varchar default util.HTTPVariableOrHeader ()
 )
 begin
 
+    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #0'
+        debug only
+    ;
+    
     -- entity
     insert into ch.entity on existing update with auto name
     select (select id
@@ -22,24 +27,10 @@ begin
        and ch.entityWriteable(name, @UOAuthRoles) = 1
     ;
 
-
-    -- attribute
-    if @attributes = 1 then
-        insert into ch.attribute on existing update with auto name
-        select (select a.id
-                  from ch.attribute a join ch.entity e on a.parent = e.id
-                 where e.xid = #attribute.parentXid
-                   and a.name = #attribute.name) as id,
-               name,
-               dataType,
-               value,
-               xmlData,
-               (select id
-                  from ch.entity
-                 where xid = #attribute.parentXid) as parent
-          from #attribute;
-    end if;
-
+    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #1'
+        debug only
+    ;
+    
     -- rel
     insert into ch.relationship on existing update with auto name
     select (select id
@@ -63,6 +54,11 @@ begin
        and child is not null
        and ch.entityWriteable(#rel.name, @UOAuthRoles) = 1
     ;
+    
+    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #2'
+        debug only
+    ;
+    
 
     -- delete rel
     delete from ch.relationship
@@ -73,6 +69,10 @@ begin
         where parentXid = ch.relationship.parentXid
             and childXid = ch.relationship.childXid
     );
+    
+    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #end'
+        debug only
+    ;
+        
 
-end
-;
+end;

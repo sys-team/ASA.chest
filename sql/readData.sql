@@ -1,9 +1,15 @@
-create or replace procedure ch.readData(
-    @request xml
+create or replace procedure ch.readData (
+    @request xml,
+    @code long varchar default util.HTTPVariableOrHeader ()
 )
 begin
 
+    message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #0'
+        debug only
+    ;
+    
     -- entities
+    
     insert into #entity on existing update with auto name
         select
             coalesce(
@@ -24,8 +30,25 @@ begin
         ) e
         where type in ('d','m')
     ;
+    
+    message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #1 ', @@rowcount
+        debug only
+    ;
+    
+    update #entity $e set
+        type = 'd', name = e.name, code = e.code,
+        xmldata = ch.filterXmldataByRe (
+            $e.xmlData, ch.aliasedColumnsRe($e.name,e.name), e.xmlData
+        )
+    from ch.entity e
+    where e.xid = $e.xid
+        and e.name <> $e.name
+        and ch.isAliasOf ($e.name, e.name) = 1
+    ;
 
-    --message 'ch.readData #1';
+    message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #3'
+        debug only
+    ;
 
     insert into #entityIgnored with auto name
     select xid, name, xmlData
@@ -34,6 +57,7 @@ begin
         from ch.entity
         where entity.xid = #entity.xid
             and entity.name <> #entity.name
+            and #entity.type <> 'm'
     );
 
     if @@rowcount > 0 then
@@ -43,7 +67,9 @@ begin
         where #entityIgnored.xid = #entity.xid
         ;
 
-        message 'ch.readData deleted: ', @@rowcount;
+        message 'ch.readData deleted: ', @@rowcount
+            debug only
+        ;
 
     end if;
 
@@ -81,6 +107,8 @@ begin
         )
     ;
 
+    message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #3'
+        debug only
     ;
 
     -- rels
@@ -104,6 +132,8 @@ begin
         ) as c
     ;
 
-    --message 'ch.readData #3';
+    message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #end'
+        debug only
+    ;
 
 end;
