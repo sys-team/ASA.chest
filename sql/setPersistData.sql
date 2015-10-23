@@ -17,7 +17,8 @@ end;
 
 
 create or replace function ch.getPersistData (
-    @name string
+    @name string,
+    @startDate timestamp default '2000-01-01'
 ) returns timestamp begin
 
     declare @result timestamp;
@@ -26,6 +27,21 @@ create or replace function ch.getPersistData (
         select persistTs from ch.persistEntityData
         where entity = @name
     );
+
+    return isnull (@result,@startDate);
+
+end;
+
+create or replace function ch.getSetPersistData (
+    @name string,
+    @ts timestamp default now()
+) returns timestamp begin
+
+    declare @result timestamp;
+
+    set @result = ch.getPersistData (@name);
+    
+    call ch.setPersistData(@name,@ts);
 
     return @result;
 
