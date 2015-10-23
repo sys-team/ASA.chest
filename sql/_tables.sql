@@ -214,3 +214,18 @@ create table if not exists ch.entityStorage(
 ;
 comment on table ch.entity is 'Entity data storage'
 ;
+
+create table if not exists ch.entityAlias(
+
+    entity varchar(64) not null,
+    aliasRe varchar(512) not null,
+    columnsRe varchar(512),
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id),
+    unique (entity,aliasRe)
+
+)
+;
+comment on table ch.entityAlias is 'Entity aliases'
+;
