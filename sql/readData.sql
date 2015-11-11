@@ -1,12 +1,17 @@
 create or replace procedure ch.readData (
     @request xml,
-    @code long varchar default util.HTTPVariableOrHeader ()
+    @code long varchar default util.HTTPVariableOrHeader (),
+    @logXid GUID default null
 )
 begin
 
     message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #0'
         debug only
     ;
+
+    update ch.log set
+        processing = 'readData'
+    where xid = @logXid;
     
     -- entities
     
@@ -35,6 +40,10 @@ begin
         debug only
     ;
     
+    update ch.log set
+        processing = 'readData:insert'
+    where xid = @logXid;
+
     update #entity $e set
         type = 'd', name = e.name, code = e.code,
         xmldata = ch.filterXmldataByRe (
@@ -50,6 +59,10 @@ begin
         debug only
     ;
 
+    update ch.log set
+        processing = 'readData:filterXmldataByRe'
+    where xid = @logXid;
+
     insert into #entityIgnored with auto name
     select xid, name, xmlData
     from #entity where exists (
@@ -59,6 +72,10 @@ begin
             and entity.name <> #entity.name
             and #entity.type <> 'm'
     );
+
+    update ch.log set
+        processing = 'readData:entityIgnored'
+    where xid = @logXid;
 
     if @@rowcount > 0 then
 
@@ -71,12 +88,16 @@ begin
             debug only
         ;
 
+        update ch.log set
+            processing = 'readData:entityIgnored:deleted'
+        where xid = @logXid;
+
     end if;
 
     -- entities from rel
     insert into #entity on existing update with auto name
         select distinct
-            coalesce(
+            coalesce (
                 util.strtoxid(xid),
                 (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
                 (select top 1 xid from #entity where name = t.name and code = t.code),
@@ -111,6 +132,10 @@ begin
         debug only
     ;
 
+    update ch.log set
+        processing = 'readData:insert:fromRel'
+    where xid = @logXid;
+
     -- rels
     insert into #rel on existing update with auto name
         select
@@ -135,5 +160,9 @@ begin
     message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #end'
         debug only
     ;
+
+    update ch.log set
+        processing = 'readData:insert:rel'
+    where xid = @logXid;
 
 end;

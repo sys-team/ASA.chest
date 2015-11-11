@@ -1,6 +1,7 @@
 create global temporary table ch.log(
 
     service varchar(128),
+    processing varchar(32),
     response xml,
     code varchar(1024),
     url long varchar,

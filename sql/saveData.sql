@@ -1,12 +1,17 @@
 create or replace procedure ch.saveData(
     @attributes integer default 0,
-    @code long varchar default util.HTTPVariableOrHeader ()
+    @code long varchar default util.HTTPVariableOrHeader (),
+    @logXid GUID default null
 )
 begin
 
     message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #0'
         debug only
     ;
+
+    update ch.log set
+        processing = 'saveData'
+    where xid = @logXid;
     
     -- entity
     insert into ch.entity on existing update with auto name
@@ -30,49 +35,46 @@ begin
     message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #1'
         debug only
     ;
-    
-    -- rel
-    insert into ch.relationship on existing update with auto name
-    select (select id
-              from ch.relationship
-             where parentXid = #rel.parentXid
-               and childXid = #rel.childXid) as [id],
-           (select id
+
+    update ch.log set
+        processing = 'saveData:inserted'
+    where xid = @logXid;
+
+
+    delete from ch.relationship
+    where parentXid in (
+        select xid from #entity where type = 'd'
+    );
+
+    update ch.log set
+        processing = 'saveData:relationship:delete'
+    where xid = @logXid;
+
+
+    merge into ch.relationship r using with auto name (
+        select
+            (select id
               from ch.entity
              where xid = #rel.parentXid) as [parent],
-           (select id
+            (select id
               from ch.entity
              where xid = #rel.childXid) as [child],
-           #rel.parentXid,
-           #rel.childXid,
-           #rel.xmlData,
-           #rel.name as [role]
-      from #rel
-     where #rel.parentXid is not null
-       and #rel.childXid is not null
-       and parent is not null
-       and child is not null
-       and ch.entityWriteable(#rel.name, @UOAuthRoles) = 1
-    ;
-    
-    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #2'
-        debug only
-    ;
-    
-
-    -- delete rel
-    delete from ch.relationship
-    where parentXid in (select xid from #entity where type = 'd')
-      and not exists (
-        select *
+            #rel.parentXid,
+            #rel.childXid,
+            #rel.xmlData,
+            #rel.name as [role]
         from #rel
-        where parentXid = ch.relationship.parentXid
-            and childXid = ch.relationship.childXid
-    );
-    
-    message 'ch.saveData ', @UOAuthAccount, ' ', @code, ' #end'
-        debug only
+        where child is not null and parent is not null
+    ) as t on t.parentXid = r.parentXid and t.childXid = r.childXid
+    when not matched
+        then insert
+    when matched
+        then update
     ;
-        
+
+    update ch.log set
+        processing = 'saveData:relationship:merge'
+    where xid = @logXid;
+
 
 end;

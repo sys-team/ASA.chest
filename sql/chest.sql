@@ -125,10 +125,12 @@ begin
 
     case @service
         when 'chest' then
-            call ch.readData(@request,@code);
-            call ch.saveData();
-            call ch.triggerEvent(@code);
+            call ch.readData(@request,@code,@xid);
+            call ch.saveData(0,@code,@xid);
             set @response = ch.makeAnswer();
+            update ch.log set
+                processing = 'makeAnswer'
+            where xid = @xid;
         when 'get' then
             set @response = ch.get(@url);
         --when 'put' then
@@ -140,8 +142,17 @@ begin
     set @response = ch.responseRootElement(@response);
 
     update ch.log set
+        processing = 'responseRootElement'
+    where xid = @xid;
+
+    if @service = 'chest' then
+        call ch.triggerEvent(@code);
+    end if;
+
+    update ch.log set
         response = @response,
-        service = @service
+        service = @service,
+        processing = 'processed'
     where xid = @xid;
 
     return @response;
