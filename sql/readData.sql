@@ -12,34 +12,35 @@ begin
     update ch.log set
         processing = 'readData'
     where xid = @logXid;
-    
+
     -- entities
-    
+
     insert into #entity on existing update with auto name
         select
             coalesce(
-                util.strtoxid(xid),
+                util.strtoxid(e.xid),
                 (select top 1 xid from ch.entity where name=e.name and code=e.code order by id desc),
                 newid()
             ) as xid,
-            name,
-            code,
-            xmlData,
-            type
+            isnull (ea.entity,e.name) as name,
+            e.code,
+            e.xmlData,
+            e.type
         from openxml(@request, '/*/*') with (
             xid long varchar '@xid',
             name long varchar '@name',
             code long varchar '@code',
             xmlData xml '@mp:xmltext',
             type varchar(32) '@mp:localname'
-        ) e
+        ) e left join ch.EntityAlias ea
+            on ea.aliasRe = e.name and ea.isFullAlias = 1
         where type in ('d','m')
     ;
-    
+
     message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #1 ', @@rowcount
         debug only
     ;
-    
+
     update ch.log set
         processing = 'readData:insert'
     where xid = @logXid;

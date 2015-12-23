@@ -229,3 +229,21 @@ create table if not exists ch.entityAlias(
 ;
 comment on table ch.entityAlias is 'Entity aliases'
 ;
+
+
+create table if not exists ch.entityAlias(
+
+    entity varchar(64) not null,
+    aliasRe varchar(512) not null,
+    columnsRe varchar(512),
+    isFullAlias BOOL,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id),
+    unique (entity,aliasRe),
+    unique (aliasre,isFullAlias)
+
+)
+;
+comment on table ch.entityAlias is 'Entity aliases'
+;
