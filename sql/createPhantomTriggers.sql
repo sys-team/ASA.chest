@@ -19,17 +19,11 @@ begin
     set @childStart = 2000;
 
     for process as parents cursor for
-    select u.user_name + '.' + t.table_name as c_parentName,
-        pcol.column_name as c_primaryColumn,
-        fcol.column_name as c_foreignColumn,
+    select parentName as c_parentName,
+        primaryColumn as c_primaryColumn,
+        foreignColumn as c_foreignColumn,
         number(*) as c_number
-    from sys.sysfkey fk join sys.systable t on fk.primary_table_id = t.table_id
-        join sys.sysuserperm u on u.user_id = t.creator
-        join sys.sysidx i on i.table_id =  fk.foreign_table_id and i.index_id =  fk.foreign_index_id
-        join sys.sysidxcol ic on ic.table_id  =i.table_id and ic.index_id = i.index_id
-        join sys.syscolumn fcol on fcol.table_id = fk.foreign_table_id and fcol.column_id = ic.column_id
-        join sys.syscolumn pcol on pcol.table_id = fk.primary_table_id and pcol.column_id = ic.primary_column_id
-    where fk.foreign_table_id = @tableId
+    from ch.fkList(null, @tableId)
     do
 
         set @sql = string(
@@ -56,17 +50,11 @@ begin
     end for;
 
     for process2 as children cursor for
-    select u.user_name + '.' + t.table_name as c_childName,
-        pcol.column_name as c_primaryColumn,
-        fcol.column_name as c_foreignColumn,
+    select childName as c_childName,
+        primaryColumn as c_primaryColumn,
+        foreignColumn as c_foreignColumn,
         number(*) as c_number
-    from sys.sysfkey fk join sys.systable t on fk.foreign_table_id = t.table_id
-        join sys.sysuserperm u on u.user_id = t.creator
-        join sys.sysidx i on i.table_id =  fk.foreign_table_id and i.index_id =  fk.foreign_index_id
-        join sys.sysidxcol ic on ic.table_id  =i.table_id and ic.index_id = i.index_id
-        join sys.syscolumn fcol on fcol.table_id = fk.foreign_table_id and fcol.column_id = ic.column_id
-        join sys.syscolumn pcol on pcol.table_id = fk.primary_table_id and pcol.column_id = ic.primary_column_id
-    where fk.primary_table_id = @tableId
+    from ch.fkList(@tableId, null)
     do
 
         set @sql = string(

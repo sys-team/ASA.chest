@@ -15,6 +15,7 @@ read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityStorage.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/entityWriteable.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/fillEntityProperty.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/fillEntityRole.sql;
+read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/fkList.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/get.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/makeAnswer.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/mergeXml.sql;
