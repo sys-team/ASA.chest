@@ -57,7 +57,7 @@ create or replace function ch.filterXmldataByRe (
             (select xmlagg(value) from dto)
         )
         into @result
-        from openxml (@xmlData, '/*') with (
+        from openxml (@xmlDataOrigin, '/*') with (
             rootName STRING '@mp:localname',
             name STRING '@name',
             xid STRING '@xid',
