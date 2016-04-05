@@ -52,7 +52,6 @@ begin
         )
     from ch.entity e
     where e.xid = $e.xid
-        and e.name <> $e.name
         and ch.isAliasOf ($e.name, e.name) = 1
     ;
 
@@ -101,7 +100,7 @@ begin
             coalesce (
                 util.strtoxid(xid),
                 (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
-                (select top 1 xid from #entity where name = t.name and code = t.code),
+                (select max(xid) from #entity where name = t.name and code = t.code),
                 newid()
             ) as xid,
             name,
@@ -117,14 +116,14 @@ begin
             where xid = coalesce(
                 util.strtoxid(xid),
                 (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
-                (select top 1 xid from #entity where name = t.name and code = t.code)
+                (select max(xid) from #entity where name = t.name and code = t.code)
             )
         ) and not exists( select *
             from ch.entity
             where xid =  coalesce(
                 util.strtoxid(xid),
                 (select top 1 xid from ch.entity where name = t.name and code = t.code order by id desc),
-                (select top 1 xid from #entity where name = t.name and code = t.code)
+                (select max(xid) from #entity where name = t.name and code = t.code)
             )
         )
     ;
