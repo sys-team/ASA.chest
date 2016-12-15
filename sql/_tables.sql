@@ -229,3 +229,14 @@ create table if not exists ch.entityAlias(
 ;
 comment on table ch.entityAlias is 'Entity aliases'
 ;
+
+create table if not exists ch.forbiddenEntity(
+
+    entity varchar(64) not null unique,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.forbiddenEntity is 'Entity stricly forbidden for receive'
+;

@@ -59,7 +59,8 @@ begin
     ------------
 
     set @xid = newid();
-    set @request = http_body();
+    set @request = ch.screenChars(http_body());
+    ---- message 'ch.chest util.isXML(@request) = ', util.isXML(@request);
     set @charSet = util.xmlCharset(@request);
 
     if @charSet is not null then
@@ -83,7 +84,7 @@ begin
     end if;
 
     set @UOAuthRoles = uac.UOAuthAuthorize(@code);
-    -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
+    -- -- message 'ch.chest @UOAuthRoles = ', @UOAuthRoles;
 
     set @UOAuthAccount = (
         select account
@@ -121,14 +122,18 @@ begin
     end if;
 
     ------------
-   -- message 'ch.chest @service = ', @service;
+    -- message 'ch.chest #1 ', @UOAuthAccount;
 
     case @service
         when 'chest' then
             call ch.readData(@request,@code);
+            -- message 'ch.chest #1.1 ', @UOAuthAccount;
             call ch.saveData();
+            -- message 'ch.chest #1.2 ', @UOAuthAccount;
             call ch.triggerEvent(@code);
+            -- message 'ch.chest #1.3 ', @UOAuthAccount;
             set @response = ch.makeAnswer();
+            -- message 'ch.chest #1.4 ', @UOAuthAccount;
         when 'get' then
             set @response = ch.get(@url);
         --when 'put' then
@@ -137,12 +142,16 @@ begin
             set @response = ch.processEmptyRequest();
     end case;
 
+    -- message 'ch.chest #2 ', @UOAuthAccount;
+
     set @response = ch.responseRootElement(@response);
 
     update ch.log set
         response = @response,
         service = @service
     where xid = @xid;
+
+    -- message 'ch.chest #3 ', @UOAuthAccount;
 
     return @response;
 
@@ -167,7 +176,7 @@ begin
                    service = @service
             where xid = @xid;
 
-            CALL dbo.sa_set_http_header( '@HttpStatus', '500' );
+            call dbo.sa_set_http_header( '@HttpStatus', '500' );
 
             return @response;
 

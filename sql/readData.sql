@@ -7,9 +7,9 @@ begin
     message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #0'
         debug only
     ;
-    
+
     -- entities
-    
+
     insert into #entity on existing update with auto name
         select
             coalesce(
@@ -29,12 +29,17 @@ begin
             type varchar(32) '@mp:localname'
         ) e
         where type in ('d','m')
+            and not exists(
+                select *
+                from ch.forbiddenEntity
+                where entity = e.name
+            )
     ;
-    
+
     message 'ch.readData ', @UOAuthAccount, ' ', @code, ' #1 ', @@rowcount
         debug only
     ;
-    
+
     update #entity $e set
         type = 'd', name = e.name, code = e.code,
         xmldata = ch.filterXmldataByRe (
