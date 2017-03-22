@@ -1,6 +1,6 @@
 create or replace function ch.chest(
-    @url long varchar,
-    @code long varchar default util.HTTPVariableOrHeader ()
+    @url STRING,
+    @code STRING default util.HTTPVariableOrHeader ()
 )
 returns xml
 begin
@@ -48,6 +48,8 @@ begin
         primary key(parentXid, name)
     );
 
+    --message 'ch.chest  @code = ', @code, ' @url = ', @url, ' #1';
+
     if varexists('@UOAuthAccount') = 0 then
         create variable @UOAuthAccount integer;
     end if;
@@ -60,6 +62,7 @@ begin
 
     set @xid = newid();
     set @request = ch.screenChars(http_body());
+    --set @request = cast(http_body() as xml);
     ---- message 'ch.chest util.isXML(@request) = ', util.isXML(@request);
     set @charSet = util.xmlCharset(@request);
 
@@ -72,12 +75,24 @@ begin
         @url as url,
         @code as code,
         if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
-        if util.isXML(@request) = 0 then @request else null endif as httpBody,
+        --if util.isXML(@request) = 0 then @request else null endif as httpBody,
         isnull(
             util.HTTPVariableOrHeader('x-real-ip'),
             connection_property('ClientNodeAddress')
         ) as callerIP
     ;
+
+    -- insert into ch.logTmp with auto name select
+    --     @xid as xid,
+    --     @url as url,
+    --     @code as code,
+    --     if util.isXML(@request) = 1 then @request else null endif as httpBodyXML,
+    --     if util.isXML(@request) = 0 then @request else null endif as httpBody,
+    --     isnull(
+    --         util.HTTPVariableOrHeader('x-real-ip'),
+    --         connection_property('ClientNodeAddress')
+    --     ) as callerIP
+    -- ;
 
     if isnull(@request,'') = '' and isnull(@url,'') = '' then
         set @service = 'settings';
@@ -97,6 +112,8 @@ begin
     where xid = @xid;
 
     if @UOAuthAccount is null then
+
+        --message 'ch.chest  @code = ', @code, ' @url = ', @url, ' #2';
 
         set @response = ch.responseRootElement(xmlelement('error', xmlattributes('NotAuthorized' as "code")));
 
@@ -150,6 +167,11 @@ begin
         response = @response,
         service = @service
     where xid = @xid;
+
+    -- update ch.logTmp set
+    --     response = @response,
+    --     service = @service
+    -- where xid = @xid;
 
     -- message 'ch.chest #3 ', @UOAuthAccount;
 

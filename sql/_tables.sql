@@ -240,3 +240,16 @@ create table if not exists ch.forbiddenEntity(
 ;
 comment on table ch.forbiddenEntity is 'Entity stricly forbidden for receive'
 ;
+
+create table if not exists ch.forbiddenChars(
+
+    ch char(1) not null unique,
+    cutLength integer default 1,
+    replaceCh STRING,
+
+    id ID, xid GUID, ts TS, cts CTS,
+    unique (xid), primary key (id)
+)
+;
+comment on table ch.forbiddenEntity is 'Chars to remove from request'
+;
