@@ -23,7 +23,7 @@ begin
     if @pos <> 0 then
 
         set @result = left(@result, @pos -1)
-            + substring(@result, @pos + 3);
+            'руб' + substring(@result, @pos + 3);
 
     end if;
 
