@@ -11,8 +11,7 @@ create table if not exists ch.entity(
     version integer default 1,
     not null foreign key(author) references uac.account,
 
-
-    id ID, xid GUID, ts TS, cts CTS,
+    id ID, xid GUID, ts TS not null unique, cts CTS,
     unique (xid), primary key (id)
 
 )
@@ -20,7 +19,8 @@ create table if not exists ch.entity(
 comment on table ch.entity is 'Entity data'
 ;
 
-create unique index ch_entity_named_code on ch.entity (name,code);
+create unique index xk_ch_entity_name_code on ch.entity (name,code)
+;
 
 create table if not exists ch.relationship(
 
