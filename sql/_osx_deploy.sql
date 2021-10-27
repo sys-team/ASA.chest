@@ -1,4 +1,6 @@
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/_tables.sql;
+read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/_temporaryTables.sql;
+read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/_triggers.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/chest.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/chest_service.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/createSP.sql;
@@ -31,6 +33,4 @@ read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/remoteColumnName.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/responseRootElement.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/saveAccessToken.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/saveData.sql;
-read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/temporaryTables.sql;
 read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/triggerEvent.sql;
-read /Users/%YourUserNameHere%/Sites/ASA.chest/sql/triggers.sql;
